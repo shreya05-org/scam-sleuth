@@ -338,7 +338,7 @@ export default function HomePage() {
               <div className="relative w-full aspect-square rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/20">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-md z-20" />
                 <Image 
-                  src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=cyber-security-hero"
+                  src="https://static.wixstatic.com/media/aa8d35_72a1fca093914d58b1de81ea834367b0~mv2.png?originWidth=576&originHeight=576"
                   alt="AI Security Visualization"
                   className="w-full h-full object-cover opacity-60 mix-blend-overlay"
                 />
@@ -628,7 +628,7 @@ export default function HomePage() {
                 <div className="relative">
                   <div className="absolute -inset-4 bg-gradient-to-r from-primary to-secondary opacity-20 blur-2xl rounded-full" />
                   <Image 
-                    src="https://static.wixstatic.com/media/12d367_71ebdd7141d041e4be3d91d80d4578dd~mv2.png?id=security-dashboard-mockup"
+                    src="https://static.wixstatic.com/media/aa8d35_ebfc2c4f44cc4528a80eeb4e24002b84~mv2.png?originWidth=1152&originHeight=768"
                     alt="Security Dashboard Interface"
                     className="relative z-10 w-full rounded-2xl border border-white/10 shadow-2xl"
                   />
