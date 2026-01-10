@@ -3,3 +3,43 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Light mode styles */
+:root:not(.dark) {
+  color-scheme: light;
+}
+
+:root:not(.dark) {
+  --background: #FAFAFA;
+  --foreground: #121212;
+  --secondary: #F5F5F5;
+  --secondary-foreground: #121212;
+  --primary: #D23F0F;
+  --primary-foreground: #FFFFFF;
+  --divider: #E0E0E0;
+  --surfacedark: #FFFFFF;
+}
+
+:root:not(.dark) body {
+  @apply bg-background text-foreground;
+}
+
+/* Dark mode styles (default) */
+:root.dark {
+  color-scheme: dark;
+}
+
+:root.dark {
+  --background: #121212;
+  --foreground: #FFFFFF;
+  --secondary: #1C1C1C;
+  --secondary-foreground: #FFFFFF;
+  --primary: #D23F0F;
+  --primary-foreground: #FFFFFF;
+  --divider: #E0E0E0;
+  --surfacedark: #1C1C1C;
+}
+
+:root.dark body {
+  @apply bg-background text-foreground;
+}

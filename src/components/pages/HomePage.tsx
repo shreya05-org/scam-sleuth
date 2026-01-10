@@ -261,7 +261,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-clip selection:bg-primary/30 selection:text-primary-foreground">
+    <div className="min-h-screen bg-background text-foreground dark:bg-[#121212] dark:text-white overflow-x-clip selection:bg-primary/30 selection:text-primary-foreground">
       <Header />
 
       {/* --- HERO SECTION --- */}

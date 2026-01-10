@@ -36,6 +36,7 @@ export default {
                 divider: "#E0E0E0",
                 surfacedark: "#1C1C1C"
             },
+            darkMode: 'class',
         },
     },
     future: {
