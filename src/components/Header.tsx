@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Header() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState<boolean | null>(null);
 
   useEffect(() => {
     // Check localStorage for saved preference, default to dark
@@ -11,24 +11,26 @@ export default function Header() {
     const shouldBeDark = savedMode === null ? true : savedMode === 'true';
     
     setIsDark(shouldBeDark);
-    
-    if (shouldBeDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyDarkMode(shouldBeDark);
   }, []);
 
+  const applyDarkMode = (isDarkMode: boolean) => {
+    const html = document.documentElement;
+    if (isDarkMode) {
+      html.classList.add('dark');
+      html.style.colorScheme = 'dark';
+    } else {
+      html.classList.remove('dark');
+      html.style.colorScheme = 'light';
+    }
+  };
+
   const toggleDarkMode = () => {
+    if (isDark === null) return;
     const newIsDark = !isDark;
     setIsDark(newIsDark);
     localStorage.setItem('darkMode', String(newIsDark));
-    
-    if (newIsDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    applyDarkMode(newIsDark);
   };
 
   return (
@@ -57,10 +59,13 @@ export default function Header() {
 
           <button
             onClick={toggleDarkMode}
-            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 dark:bg-white/10 bg-black/10 dark:border-white/20 border-black/20 border"
+            disabled={isDark === null}
+            className="w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110 dark:bg-white/10 bg-black/10 dark:border-white/20 border-black/20 border disabled:opacity-50"
             aria-label="Toggle dark mode"
           >
-            {isDark ? (
+            {isDark === null ? (
+              <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            ) : isDark ? (
               <Sun className="w-5 h-5 text-primary" />
             ) : (
               <Moon className="w-5 h-5 text-primary" />

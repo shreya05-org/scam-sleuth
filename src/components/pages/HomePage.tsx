@@ -321,10 +321,6 @@ export default function HomePage() {
                 </span>
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               </button>
-              
-              <button className="px-8 py-4 bg-transparent border border-white/20 text-white font-heading font-bold text-lg rounded-lg hover:bg-white/5 transition-colors">
-                View Live Metrics
-              </button>
             </motion.div>
           </div>
 
@@ -648,9 +644,30 @@ export default function HomePage() {
 
               <div className="space-y-8">
                 {[
-                  { title: "Linguistic Analysis", desc: "Detects urgency, pressure, and unprofessional communication patterns." },
-                  { title: "Financial Anomaly Detection", desc: "Compares salary offers against real-time market data for specific roles." },
-                  { title: "Platform Verification", desc: "Identifies attempts to move communication to unmonitored channels." }
+                  { 
+                    title: "Linguistic Analysis", 
+                    desc: "Detects urgency, pressure, and unprofessional communication patterns. Our AI scans for red flag keywords and phrases commonly used in scam job postings." 
+                  },
+                  { 
+                    title: "Financial Anomaly Detection", 
+                    desc: "Compares salary offers against real-time market data for specific roles. We identify unrealistic compensation packages that deviate significantly from industry standards." 
+                  },
+                  { 
+                    title: "Platform Verification", 
+                    desc: "Identifies attempts to move communication to unmonitored channels. Legitimate employers maintain professional communication through official job boards." 
+                  },
+                  {
+                    title: "Pattern Recognition",
+                    desc: "Uses machine learning to identify emerging scam tactics and evolving fraud patterns based on thousands of analyzed job postings."
+                  },
+                  {
+                    title: "Risk Scoring",
+                    desc: "Generates a comprehensive risk score (0-100%) based on detected red flags, helping you make informed decisions about opportunities."
+                  },
+                  {
+                    title: "Real-Time Recommendations",
+                    desc: "Provides actionable guidance tailored to the specific risks detected, including steps to verify legitimacy and protect yourself."
+                  }
                 ].map((item, i) => (
                   <AnimatedReveal key={i} delay={i * 150}>
                     <div className="flex gap-6">
