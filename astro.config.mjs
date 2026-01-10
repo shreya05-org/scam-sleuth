@@ -8,9 +8,6 @@ import react from "@astrojs/react";
 import sourceAttrsPlugin from "@wix/babel-plugin-jsx-source-attrs";
 import dynamicDataPlugin from "@wix/babel-plugin-jsx-dynamic-data";
 import customErrorOverlayPlugin from "./vite-error-overlay-plugin.js";
-import wixPages from "@wix/astro-pages";
-import { PAGES_SUFFIX_PATH, parsePagesFromFile } from "@wix/vibe-routes-parser";
-import { join } from "node:path";
 
 const isBuild = process.env.NODE_ENV == "production";
 
@@ -30,11 +27,11 @@ export default defineConfig({
                 const localUrl = 'http://localhost:3202/framewire/index.mjs';
                 const cdnUrl = \`https://static.parastorage.com/services/framewire/\${version}/index.mjs\`;
                 const url = version === 'local' ? localUrl : cdnUrl;
-                const framewireModule = await import(/* @vite-ignore */ url);
+                const framewireModule = await import(url);
                 globalThis.framewire = framewireModule;
                 framewireModule.init({}, import.meta.hot);
                 console.log('Framewire initialized');
-              }`,
+              }`
             );
           }
         },
@@ -43,26 +40,15 @@ export default defineConfig({
     tailwind(),
     wix({
       htmlEmbeds: isBuild,
-      auth: true,
+      auth: true
     }),
     isBuild ? monitoring() : undefined,
     react({ babel: { plugins: [sourceAttrsPlugin, dynamicDataPlugin] } }),
-    {
-      name: "Watch router tsx file",
-      hooks: {
-        "astro:config:setup"({ addWatchFile }) {
-          addWatchFile(join(import.meta.dirname, PAGES_SUFFIX_PATH));
-        },
-      },
-    },
-    wixPages({
-      extendPages: async () => {
-        return parsePagesFromFile(import.meta.dirname);
-      },
-    }),
   ],
   vite: {
-    plugins: [customErrorOverlayPlugin()],
+    plugins: [
+      customErrorOverlayPlugin(),
+    ],
   },
   adapter: isBuild ? cloudProviderFetchAdapter({}) : undefined,
   devToolbar: {
@@ -75,7 +61,4 @@ export default defineConfig({
     allowedHosts: true,
     host: true,
   },
-  security: {
-    checkOrigin: false
-  }
 });
