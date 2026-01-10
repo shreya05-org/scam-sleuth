@@ -26,9 +26,9 @@ export default {
                 'glassmorphism-overlay': 'rgba(255, 255, 255, 0.1)',
                 destructive: '#F44336',
                 'destructive-foreground': '#FFFFFF',
-                background: '#121212',
+                background: '#FFFFFF',
                 secondary: '#BB86FC',
-                foreground: '#FFFFFF',
+                foreground: '#000000',
                 'secondary-foreground': '#000000',
                 'primary-foreground': '#000000',
                 primary: '#64FFDA'

@@ -265,10 +265,10 @@ export default function HomePage() {
       <Header />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 bg-white dark:bg-[#121212]">
         {/* Dynamic Background Grid */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
           <motion.div 
             style={{ y: heroY, opacity: heroOpacity }}
             className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" 
@@ -286,7 +286,7 @@ export default function HomePage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-sm mb-6">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -296,12 +296,12 @@ export default function HomePage() {
               
               <h1 className="font-heading text-6xl md:text-8xl font-bold leading-[0.9] tracking-tighter mb-6">
                 UNMASKING <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-black dark:via-white to-secondary">
                   SCAMS
                 </span>
               </h1>
               
-              <p className="font-paragraph text-xl text-white/60 max-w-2xl leading-relaxed">
+              <p className="font-paragraph text-xl text-black/60 dark:text-white/60 max-w-2xl leading-relaxed">
                 Advanced algorithmic detection for the modern job market. We analyze patterns, detect anomalies, and protect your career from fraudulent actors.
               </p>
             </motion.div>
@@ -331,8 +331,8 @@ export default function HomePage() {
               transition={{ duration: 1, ease: "easeOut" }}
               className="relative z-10"
             >
-              <div className="relative w-full aspect-square rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-primary/20">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent backdrop-blur-md z-20" />
+              <div className="relative w-full aspect-square rounded-3xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-primary/20">
+                <div className="absolute inset-0 bg-gradient-to-br from-black/10 dark:from-white/10 to-transparent backdrop-blur-md z-20" />
                 <Image 
                   src="https://static.wixstatic.com/media/aa8d35_72a1fca093914d58b1de81ea834367b0~mv2.png?originWidth=576&originHeight=576"
                   alt="AI Security Visualization"
@@ -373,27 +373,27 @@ export default function HomePage() {
       </section>
 
       {/* --- STATS TICKER --- */}
-      <div className="w-full bg-white/5 border-y border-white/10 overflow-hidden py-4 backdrop-blur-sm">
+      <div className="w-full bg-black/5 dark:bg-white/5 border-y border-black/10 dark:border-white/10 overflow-hidden py-4 backdrop-blur-sm">
         <div className="flex whitespace-nowrap animate-marquee">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex items-center gap-12 mx-6">
-              <span className="flex items-center gap-2 text-white/70 font-mono text-sm">
+              <span className="flex items-center gap-2 text-black/70 dark:text-white/70 font-mono text-sm">
                 <Users className="w-4 h-4 text-primary" /> 10,000+ USERS PROTECTED
               </span>
-              <span className="flex items-center gap-2 text-white/70 font-mono text-sm">
+              <span className="flex items-center gap-2 text-black/70 dark:text-white/70 font-mono text-sm">
                 <DollarSign className="w-4 h-4 text-secondary" /> $2.5M+ FRAUD PREVENTED
               </span>
-              <span className="flex items-center gap-2 text-white/70 font-mono text-sm">
+              <span className="flex items-center gap-2 text-black/70 dark:text-white/70 font-mono text-sm">
                 <Activity className="w-4 h-4 text-primary" /> REAL-TIME ANALYSIS
               </span>
-              <span className="text-white/20">///</span>
+              <span className="text-black/20 dark:text-white/20">///</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* --- MAIN INTERFACE SECTION --- */}
-      <section id="analysis-interface" className="py-32 relative">
+      <section id="analysis-interface" className="py-32 relative bg-white dark:bg-[#121212]">
         <div className="container mx-auto px-6 max-w-[100rem]">
           
           <div className="grid lg:grid-cols-12 gap-8">
@@ -401,8 +401,8 @@ export default function HomePage() {
             <div className="lg:col-span-4 space-y-8">
               <div className="sticky top-32">
                 <AnimatedReveal>
-                  <h2 className="font-heading text-4xl font-bold mb-6">Detection Protocols</h2>
-                  <p className="text-white/60 mb-8 font-paragraph">
+                  <h2 className="font-heading text-4xl font-bold mb-6 text-black dark:text-white">Detection Protocols</h2>
+                  <p className="text-black/60 dark:text-white/60 mb-8 font-paragraph">
                     Our AI engine scans for specific linguistic and structural patterns associated with high-risk job postings.
                   </p>
                 </AnimatedReveal>
@@ -410,12 +410,12 @@ export default function HomePage() {
                 <div className="space-y-4">
                   {redFlagCriteria.map((criteria, idx) => (
                     <AnimatedReveal key={criteria._id || idx} delay={idx * 100}>
-                      <div className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-colors cursor-default">
+                      <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-heading font-bold text-white group-hover:text-primary transition-colors">{criteria.name}</h3>
-                          <AlertOctagon className="w-4 h-4 text-white/30 group-hover:text-primary transition-colors" />
+                          <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">{criteria.name}</h3>
+                          <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
                         </div>
-                        <p className="text-sm text-white/50 line-clamp-2">{criteria.explanation}</p>
+                        <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">{criteria.explanation}</p>
                       </div>
                     </AnimatedReveal>
                   ))}
@@ -426,15 +426,15 @@ export default function HomePage() {
             {/* Right Column: The Interface */}
             <div className="lg:col-span-8">
               <AnimatedReveal className="h-full">
-                <div className="relative h-full min-h-[600px] rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden shadow-2xl">
+                <div className="relative h-full min-h-[600px] rounded-3xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-black/40 backdrop-blur-xl overflow-hidden shadow-2xl">
                   {/* Glassmorphism Header */}
-                  <div className="absolute top-0 left-0 right-0 h-16 border-b border-white/10 bg-white/5 flex items-center px-6 justify-between z-20">
+                  <div className="absolute top-0 left-0 right-0 h-16 border-b border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 flex items-center px-6 justify-between z-20">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-red-500/50" />
                       <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                       <div className="w-3 h-3 rounded-full bg-green-500/50" />
                     </div>
-                    <div className="font-mono text-xs text-white/30">ANALYSIS_MODULE_V1.0</div>
+                    <div className="font-mono text-xs text-black/30 dark:text-white/30">ANALYSIS_MODULE_V1.0</div>
                   </div>
 
                   {/* Content Area */}
@@ -448,21 +448,21 @@ export default function HomePage() {
                           exit={{ opacity: 0 }}
                           className="flex-1 flex flex-col"
                         >
-                          <label className="font-heading text-lg text-white/80 mb-4 block">
+                          <label className="font-heading text-lg text-black/80 dark:text-white/80 mb-4 block">
                             Input Source Data
                           </label>
                           <textarea
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}
                             placeholder="// Paste job description or recruiter message here for analysis..."
-                            className="flex-1 w-full bg-white/5 border border-white/10 rounded-xl p-6 font-mono text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all resize-none mb-6"
+                            className="flex-1 w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-6 font-mono text-sm text-black dark:text-white placeholder:text-black/20 dark:placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:bg-black/10 dark:focus:bg-white/10 transition-all resize-none mb-6"
                           />
                           
                           <div className="flex justify-end">
                             <button
                               onClick={analyzeText}
                               disabled={isAnalyzing || !inputText.trim()}
-                              className="relative overflow-hidden px-10 py-4 bg-white text-black font-heading font-bold rounded-lg hover:bg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="relative overflow-hidden px-10 py-4 bg-black dark:bg-white text-white dark:text-black font-heading font-bold rounded-lg hover:bg-black/80 dark:hover:bg-white/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {isAnalyzing ? (
                                 <span className="flex items-center gap-2">
@@ -488,10 +488,10 @@ export default function HomePage() {
                           {analysisResult && (
                             <div className="grid lg:grid-cols-2 gap-8 h-full">
                               {/* Score Column */}
-                              <div className="flex flex-col items-center justify-center p-8 bg-white/5 rounded-2xl border border-white/10">
+                              <div className="flex flex-col items-center justify-center p-8 bg-black/5 dark:bg-white/5 rounded-2xl border border-black/10 dark:border-white/10">
                                 <div className="relative w-64 h-64 mb-8">
                                   <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="128" cy="128" r="120" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" />
+                                    <circle cx="128" cy="128" r="120" fill="none" stroke="rgba(0,0,0,0.05)" strokeWidth="16" />
                                     <motion.circle
                                       cx="128"
                                       cy="128"
@@ -507,18 +507,18 @@ export default function HomePage() {
                                     />
                                   </svg>
                                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="font-heading text-6xl font-bold text-white">{analysisResult.totalRisk}%</span>
-                                    <span className="font-mono text-sm text-white/50 mt-2">RISK PROBABILITY</span>
+                                    <span className="font-heading text-6xl font-bold text-black dark:text-white">{analysisResult.totalRisk}%</span>
+                                    <span className="font-mono text-sm text-black/50 dark:text-white/50 mt-2">RISK PROBABILITY</span>
                                   </div>
                                 </div>
                                 
                                 <div className="w-full grid grid-cols-2 gap-4">
-                                  <div className="p-4 bg-black/40 rounded-lg border border-white/10 text-center">
-                                    <div className="text-xs text-white/40 font-mono mb-1">SCAN TIME</div>
+                                  <div className="p-4 bg-white/40 dark:bg-black/40 rounded-lg border border-black/10 dark:border-white/10 text-center">
+                                    <div className="text-xs text-black/40 dark:text-white/40 font-mono mb-1">SCAN TIME</div>
                                     <div className="text-xl font-bold text-primary">{analysisResult.scanTime}s</div>
                                   </div>
-                                  <div className="p-4 bg-black/40 rounded-lg border border-white/10 text-center">
-                                    <div className="text-xs text-white/40 font-mono mb-1">FLAGS</div>
+                                  <div className="p-4 bg-white/40 dark:bg-black/40 rounded-lg border border-black/10 dark:border-white/10 text-center">
+                                    <div className="text-xs text-black/40 dark:text-white/40 font-mono mb-1">FLAGS</div>
                                     <div className="text-xl font-bold text-secondary">{analysisResult.detectedFlags.length}</div>
                                   </div>
                                 </div>
@@ -527,14 +527,14 @@ export default function HomePage() {
                               {/* Details Column */}
                               <div className="flex flex-col h-full overflow-hidden">
                                 <div className="flex items-center justify-between mb-6">
-                                  <h3 className="font-heading text-2xl font-bold">Analysis Report</h3>
+                                  <h3 className="font-heading text-2xl font-bold text-black dark:text-white">Analysis Report</h3>
                                   <button 
                                     onClick={() => {
                                       setActiveTab('input');
                                       setInputText('');
                                       setAnalysisResult(null);
                                     }}
-                                    className="text-xs font-mono text-white/50 hover:text-white underline"
+                                    className="text-xs font-mono text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white underline"
                                   >
                                     NEW SCAN
                                   </button>
@@ -545,8 +545,8 @@ export default function HomePage() {
                                     <div className="p-6 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center gap-4">
                                       <CheckCircle2 className="w-8 h-8 text-green-500" />
                                       <div>
-                                        <h4 className="font-bold text-green-400">No Red Flags Detected</h4>
-                                        <p className="text-sm text-white/60">The content appears to be safe based on our current criteria.</p>
+                                        <h4 className="font-bold text-green-600 dark:text-green-400">No Red Flags Detected</h4>
+                                        <p className="text-sm text-black/60 dark:text-white/60">The content appears to be safe based on our current criteria.</p>
                                       </div>
                                     </div>
                                   ) : (
@@ -556,23 +556,23 @@ export default function HomePage() {
                                         initial={{ opacity: 0, x: 20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: i * 0.1 }}
-                                        className="p-4 rounded-xl bg-white/5 border-l-4 border-white/10 hover:bg-white/10 transition-colors"
+                                        className="p-4 rounded-xl bg-black/5 dark:bg-white/5 border-l-4 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                                         style={{ borderLeftColor: flag.severityLevel === 'high' ? '#F44336' : '#FF9800' }}
                                       >
                                         <div className="flex justify-between items-start mb-2">
-                                          <h4 className="font-bold text-white">{flag.name}</h4>
-                                          <span className="text-xs font-mono px-2 py-1 rounded bg-black/40 text-white/60">{flag.riskContribution}% RISK</span>
+                                          <h4 className="font-bold text-black dark:text-white">{flag.name}</h4>
+                                          <span className="text-xs font-mono px-2 py-1 rounded bg-white/40 dark:bg-black/40 text-black/60 dark:text-white/60">{flag.riskContribution}% RISK</span>
                                         </div>
-                                        <p className="text-sm text-white/60">{flag.explanation}</p>
+                                        <p className="text-sm text-black/60 dark:text-white/60">{flag.explanation}</p>
                                       </motion.div>
                                     ))
                                   )}
                                 </div>
 
-                                <div className="mt-6 pt-6 border-t border-white/10">
+                                <div className="mt-6 pt-6 border-t border-black/10 dark:border-white/10">
                                   <button 
                                     onClick={saveReport}
-                                    className="w-full py-3 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-colors text-sm font-heading font-bold"
+                                    className="w-full py-3 flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 rounded-lg transition-colors text-sm font-heading font-bold text-black dark:text-white"
                                   >
                                     <Save className="w-4 h-4" /> Download Full Report
                                   </button>
@@ -593,20 +593,20 @@ export default function HomePage() {
 
       {/* --- RECOMMENDATIONS SECTION (Conditional) --- */}
       {analysisResult && analysisResult.recommendations.length > 0 && (
-        <section className="py-24 bg-white/5 border-y border-white/10">
+        <section className="py-24 bg-black/5 dark:bg-white/5 border-y border-black/10 dark:border-white/10">
           <div className="container mx-auto px-6 max-w-[100rem]">
             <AnimatedReveal>
-              <h2 className="font-heading text-3xl font-bold mb-12 text-center">Strategic Recommendations</h2>
+              <h2 className="font-heading text-3xl font-bold mb-12 text-center text-black dark:text-white">Strategic Recommendations</h2>
             </AnimatedReveal>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {analysisResult.recommendations.map((rec, idx) => (
                 <AnimatedReveal key={idx} delay={idx * 100}>
-                  <div className="h-full p-8 rounded-2xl bg-black/40 border border-white/10 hover:border-primary/30 transition-all group">
+                  <div className="h-full p-8 rounded-2xl bg-white/40 dark:bg-black/40 border border-black/10 dark:border-white/10 hover:border-primary/30 transition-all group">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-black transition-colors">
                       <span className="font-heading font-bold">{idx + 1}</span>
                     </div>
-                    <p className="text-white/80 leading-relaxed">{rec}</p>
+                    <p className="text-black/80 dark:text-white/80 leading-relaxed">{rec}</p>
                   </div>
                 </AnimatedReveal>
               ))}
@@ -616,7 +616,7 @@ export default function HomePage() {
       )}
 
       {/* --- EDUCATIONAL / HOW IT WORKS --- */}
-      <section className="py-32 relative overflow-hidden">
+      <section className="py-32 relative overflow-hidden bg-white dark:bg-[#121212]">
         <div className="container mx-auto px-6 max-w-[100rem]">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="order-2 lg:order-1">
@@ -626,7 +626,7 @@ export default function HomePage() {
                   <Image 
                     src="https://static.wixstatic.com/media/aa8d35_ebfc2c4f44cc4528a80eeb4e24002b84~mv2.png?originWidth=1152&originHeight=768"
                     alt="Security Dashboard Interface"
-                    className="relative z-10 w-full rounded-2xl border border-white/10 shadow-2xl"
+                    className="relative z-10 w-full rounded-2xl border border-black/10 dark:border-white/10 shadow-2xl"
                   />
                 </div>
               </AnimatedReveal>
@@ -634,10 +634,10 @@ export default function HomePage() {
             
             <div className="order-1 lg:order-2 space-y-12">
               <AnimatedReveal>
-                <h2 className="font-heading text-5xl font-bold mb-6">
+                <h2 className="font-heading text-5xl font-bold mb-6 text-black dark:text-white">
                   How We <span className="text-primary">Protect You</span>
                 </h2>
-                <p className="text-xl text-white/60">
+                <p className="text-xl text-black/60 dark:text-white/60">
                   Our multi-layered analysis engine breaks down job postings into component signals, comparing them against a database of known fraud patterns.
                 </p>
               </AnimatedReveal>
@@ -671,12 +671,12 @@ export default function HomePage() {
                 ].map((item, i) => (
                   <AnimatedReveal key={i} delay={i * 150}>
                     <div className="flex gap-6">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center">
                         <CheckCircle2 className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-heading text-xl font-bold mb-2">{item.title}</h3>
-                        <p className="text-white/50">{item.desc}</p>
+                        <h3 className="font-heading text-xl font-bold mb-2 text-black dark:text-white">{item.title}</h3>
+                        <p className="text-black/60 dark:text-white/50">{item.desc}</p>
                       </div>
                     </div>
                   </AnimatedReveal>
@@ -688,20 +688,20 @@ export default function HomePage() {
       </section>
 
       {/* --- CTA SECTION --- */}
-      <section className="py-32 relative">
+      <section className="py-32 relative bg-white dark:bg-[#121212]">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
         <div className="container mx-auto px-6 text-center relative z-10">
           <AnimatedReveal>
-            <h2 className="font-heading text-5xl md:text-7xl font-bold mb-8">
+            <h2 className="font-heading text-5xl md:text-7xl font-bold mb-8 text-black dark:text-white">
               Stay One Step <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-white">Ahead of Fraud</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-black dark:to-white">Ahead of Fraud</span>
             </h2>
-            <p className="text-xl text-white/60 max-w-2xl mx-auto mb-12">
+            <p className="text-xl text-black/60 dark:text-white/60 max-w-2xl mx-auto mb-12">
               Join thousands of job seekers who use our intelligence engine to verify opportunities before they apply.
             </p>
             <button 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="px-12 py-5 bg-white text-black font-heading font-bold text-xl rounded-full hover:scale-105 transition-transform shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]"
+              className="px-12 py-5 bg-black dark:bg-white text-white dark:text-black font-heading font-bold text-xl rounded-full hover:scale-105 transition-transform shadow-[0_0_40px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]"
             >
               Start Free Analysis
             </button>
