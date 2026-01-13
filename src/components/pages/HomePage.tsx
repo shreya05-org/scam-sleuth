@@ -626,6 +626,8 @@ export default function HomePage() {
                   <Image 
                     src="https://static.wixstatic.com/media/aa8d35_ebfc2c4f44cc4528a80eeb4e24002b84~mv2.png?originWidth=1152&originHeight=768"
                     alt="Security Dashboard Interface"
+                    originWidth={1152}
+                    originHeight={768}
                     className="relative z-10 w-full rounded-2xl border border-black/10 dark:border-white/10 shadow-2xl"
                   />
                 </div>
