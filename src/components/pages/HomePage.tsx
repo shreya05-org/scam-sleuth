@@ -183,10 +183,9 @@ export default function HomePage() {
       const keywords = criterion.keywords?.toLowerCase().split(',').map(k => k.trim()) || [];
       let detected = false;
 
-      // Payment criterion - refined detection to avoid false positives
+      // Payment criterion - enhanced detection for tuition, fees, and payment requests
       if (criterionName.includes('payment') || criterionName.includes('upfront')) {
-        // Only detect if there's a clear payment REQUEST pattern
-        // Look for combinations of payment keywords with action/request words
+        // Pattern 1: Direct payment REQUEST patterns
         const paymentRequestPatterns = [
           /\b(pay|payment|deposit|fee|charge|cost)\s+(required|needed|must|should|necessary|mandatory|expected|demanded)/i,
           /\b(require|need|must|should|expect|demand)\s+\w*\s*(pay|payment|deposit|fee|charge|cost)/i,
@@ -198,9 +197,23 @@ export default function HomePage() {
         
         detected = paymentRequestPatterns.some(pattern => pattern.test(inputText));
         
-        // Additional check: if basic keywords match, verify it's not just about salary/compensation
+        // Pattern 2: Tuition and fee-related mentions (including reductions/discounts)
+        // These indicate a payment structure even if not explicitly requesting payment
+        const tuitionFeePatterns = [
+          /\b(tuition|course fee|training fee|enrollment fee|admission fee|certification fee)\b/i,
+          /\b\d+\s*(?:percent|%)\s+(tuition|fee|cost)\s+(reduction|discount|waiver)/i,
+          /\b(tuition|fee|cost)\s+(reduction|discount|waiver)\s+(?:of\s+)?\d+\s*(?:percent|%)/i,
+          /\b(reduced|discounted)\s+(tuition|fee|cost)/i,
+          /\b(tuition|fee)\s+(?:is\s+)?(?:only\s+)?(?:₹|£|\$|€)\s*\d+/i
+        ];
+        
+        if (!detected) {
+          detected = tuitionFeePatterns.some(pattern => pattern.test(inputText));
+        }
+        
+        // Pattern 3: Contextual payment demands (if basic keywords match)
         if (!detected && keywords.some(keyword => textLower.includes(keyword))) {
-          // Check if it's in context of a request/demand (not just mentioning payment/salary)
+          // Check if it's in context of a request/demand (not just mentioning salary/compensation)
           const contextualCheck = /(you must|you need to|you should|please|kindly|required to)\s+.{0,50}(pay|payment|fee|deposit|charge)/i;
           detected = contextualCheck.test(inputText);
         }
