@@ -334,9 +334,10 @@ export default function HomePage() {
           /\b(pay|payment|deposit|fee|charge|cost)\s+(required|needed|must|should|necessary|mandatory|expected|demanded)/i,
           /\b(require|need|must|should|expect|demand)\s+\w*\s*(pay|payment|deposit|fee|charge|cost)/i,
           /\b(upfront|advance|initial|registration|processing|training)\s+(pay|payment|deposit|fee|charge|cost)/i,
-          /\b(pay|payment|deposit|fee|charge|cost)\s+(upfront|advance|initial|first|before|prior)/i,
+          /\b(pay|payment|deposit|fee|charge|cost)?\s*(upfront|advance|initial|first|before|prior)/i,
           /\b(send|transfer|wire|remit)\s+\w*\s*(money|payment|amount|funds)/i,
-          /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i
+          /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i,
+          /\b(you|candidate|applicant)?\s*(will|must|need to|should|have to)?\s*(pay|deposit|send|transfer)/i
         ];
         
         detected = paymentRequestPatterns.some(pattern => pattern.test(inputText));
@@ -344,11 +345,13 @@ export default function HomePage() {
         // Pattern 2: Tuition and fee-related mentions (including reductions/discounts)
         // These indicate a payment structure even if not explicitly requesting payment
         const tuitionFeePatterns = [
-          /\b(tuition|course fee|training fee|enrollment fee|admission fee|certification fee)\b/i,
-          /\b\d+\s*(?:percent|%)\s+(tuition|fee|cost)\s+(reduction|discount|waiver)/i,
-          /\b(tuition|fee|cost)\s+(reduction|discount|waiver)\s+(?:of\s+)?\d+\s*(?:percent|%)/i,
+          /\b(tuition|course fee|training fee|enrollment fee|admission fee|certification fee)/i,
+          /\b\d+\s*(?:percent|%)\s+(tuition|fee|cost)?\s*(reduction|discount|waiver)/i,
+          /\b(tuition|fee|cost)?\s*(reduction|discount|waiver)\s+(?:of\s+)?\d+\s*(?:percent|%)/i,
           /\b(reduced|discounted)\s+(tuition|fee|cost)/i,
-          /\b(tuition|fee)\s+(?:is\s+)?(?:only\s+)?(?:₹|£|\$|€)\s*\d+/i
+          /\b(tuition|fee)\s+(?:is\s+)?(?:only\s+)?(?:₹|£|\$|€)?\s*\d+/i,
+          /\b(training|course|program|certification)\s+(fee|cost|charge)/i,
+          /\b(fee|cost|charge|payment)\s+(?:for|of)\s+(training|course|program|certification)/i
         ];
         
         if (!detected) {
@@ -358,8 +361,21 @@ export default function HomePage() {
         // Pattern 3: Contextual payment demands (if basic keywords match)
         if (!detected && keywords.some(keyword => textLower.includes(keyword))) {
           // Check if it's in context of a request/demand (not just mentioning salary/compensation)
-          const contextualCheck = /(you must|you need to|you should|please|kindly|required to)\s+.{0,50}(pay|payment|fee|deposit|charge)/i;
+          const contextualCheck = /(you must|you need to|you should|please|kindly|required to|have to|will need to)\s+.{0,50}(pay|payment|fee|deposit|charge)/i;
           detected = contextualCheck.test(inputText);
+        }
+        
+        // Pattern 4: Any mention of payment/fee in job context (broadest catch)
+        if (!detected) {
+          // Check for any fee/payment mention that's not about salary being paid TO the candidate
+          const broadPaymentCheck = /\b(fee|charge|deposit|payment|cost)\b/i;
+          if (broadPaymentCheck.test(inputText)) {
+            // Exclude if it's clearly about salary/compensation TO the candidate
+            const salaryContext = /\b(salary|compensation|pay|wage|income|earning)\s+(?:of|is|will be|:)\s*(?:₹|£|\$|€)?\s*\d+/i;
+            if (!salaryContext.test(inputText)) {
+              detected = true;
+            }
+          }
         }
       }
       // Urgency/Pressure criterion - enhanced detection
