@@ -139,21 +139,24 @@ export default function HomePage() {
     const recommendations: string[] = [];
     const generalRec = riskRecommendations.find(r => r.riskLevel?.toLowerCase() === riskLevel.toLowerCase());
     
+    // Always add general recommendation based on risk level
     if (generalRec?.generalRecommendation) {
       recommendations.push(generalRec.generalRecommendation);
     }
 
+    // Add specific guidance for each detected flag
     flags.forEach(flag => {
-      if (flag.name.toLowerCase().includes('payment') && generalRec?.upfrontPaymentGuidance) {
+      const flagName = flag.name.toLowerCase();
+      if ((flagName.includes('payment') || flagName.includes('upfront')) && generalRec?.upfrontPaymentGuidance) {
         recommendations.push(generalRec.upfrontPaymentGuidance);
       }
-      if (flag.name.toLowerCase().includes('urgency') && generalRec?.urgencyLanguageGuidance) {
+      if ((flagName.includes('urgency') || flagName.includes('pressure')) && generalRec?.urgencyLanguageGuidance) {
         recommendations.push(generalRec.urgencyLanguageGuidance);
       }
-      if (flag.name.toLowerCase().includes('messaging') && generalRec?.externalMessagingGuidance) {
+      if ((flagName.includes('messaging') || flagName.includes('external')) && generalRec?.externalMessagingGuidance) {
         recommendations.push(generalRec.externalMessagingGuidance);
       }
-      if (flag.name.toLowerCase().includes('salary') && generalRec?.salaryAnomalyGuidance) {
+      if (flagName.includes('salary') && generalRec?.salaryAnomalyGuidance) {
         recommendations.push(generalRec.salaryAnomalyGuidance);
       }
     });
@@ -172,11 +175,30 @@ export default function HomePage() {
 
     const detectedFlags: DetectedFlag[] = [];
     let totalRisk = 0;
+    const textLower = inputText.toLowerCase();
 
+    // Check each criterion with specific logic
     redFlagCriteria.forEach(criterion => {
+      const criterionName = criterion.name?.toLowerCase() || '';
       const keywords = criterion.keywords?.toLowerCase().split(',').map(k => k.trim()) || [];
-      const textLower = inputText.toLowerCase();
-      const detected = keywords.some(keyword => textLower.includes(keyword));
+      let detected = false;
+
+      // Payment criterion - only detect if payment-related keywords are present
+      if (criterionName.includes('payment') || criterionName.includes('upfront')) {
+        detected = keywords.some(keyword => textLower.includes(keyword));
+      }
+      // Urgency/Pressure criterion
+      else if (criterionName.includes('urgency') || criterionName.includes('pressure')) {
+        detected = keywords.some(keyword => textLower.includes(keyword));
+      }
+      // External messaging criterion
+      else if (criterionName.includes('messaging') || criterionName.includes('external')) {
+        detected = keywords.some(keyword => textLower.includes(keyword));
+      }
+      // For any other criteria, check keywords normally
+      else {
+        detected = keywords.some(keyword => textLower.includes(keyword));
+      }
       
       if (detected) {
         const contribution = criterion.riskContribution || 25;
@@ -191,19 +213,24 @@ export default function HomePage() {
       }
     });
 
+    // Check for salary anomalies separately
     const salaryDetected = checkSalaryAnomalies(inputText);
     if (salaryDetected) {
       const salaryCriterion = redFlagCriteria.find(c => c.name?.toLowerCase().includes('salary'));
       if (salaryCriterion) {
-        const contribution = salaryCriterion.riskContribution || 25;
-        totalRisk += contribution;
-        detectedFlags.push({
-          name: salaryCriterion.name || 'Salary Anomaly',
-          detected: true,
-          explanation: salaryCriterion.explanation || 'Unrealistic salary detected',
-          riskContribution: contribution,
-          severityLevel: salaryCriterion.severityLevel || 'medium'
-        });
+        // Only add if not already detected
+        const alreadyAdded = detectedFlags.some(f => f.name?.toLowerCase().includes('salary'));
+        if (!alreadyAdded) {
+          const contribution = salaryCriterion.riskContribution || 25;
+          totalRisk += contribution;
+          detectedFlags.push({
+            name: salaryCriterion.name || 'Salary Anomaly',
+            detected: true,
+            explanation: salaryCriterion.explanation || 'Unrealistic salary detected',
+            riskContribution: contribution,
+            severityLevel: salaryCriterion.severityLevel || 'medium'
+          });
+        }
       }
     }
 
@@ -567,6 +594,28 @@ export default function HomePage() {
                                       </motion.div>
                                     ))
                                   )}
+
+                                  {/* Conclusion Section */}
+                                  <div className="mt-6 p-6 rounded-xl bg-primary/10 border border-primary/20">
+                                    <h4 className="font-heading font-bold text-lg mb-3 text-black dark:text-white flex items-center gap-2">
+                                      <AlertTriangle className="w-5 h-5 text-primary" />
+                                      Conclusion
+                                    </h4>
+                                    <p className="text-black/80 dark:text-white/80 leading-relaxed">
+                                      {analysisResult.riskLevel === 'LOW' && analysisResult.totalRisk === 0 && (
+                                        "No red flags detected. This opportunity appears legitimate based on our analysis. However, always verify company details independently before proceeding."
+                                      )}
+                                      {analysisResult.riskLevel === 'LOW' && analysisResult.totalRisk > 0 && (
+                                        "Minor red flags detected. Consider contacting the recruiter for clarification before taking any action. Verify company authenticity through official channels."
+                                      )}
+                                      {analysisResult.riskLevel === 'MEDIUM' && (
+                                        "Moderate risk detected. Exercise caution and thoroughly verify the company's legitimacy. Do not share sensitive personal information or make any payments until you've confirmed authenticity through multiple sources."
+                                      )}
+                                      {analysisResult.riskLevel === 'HIGH' && (
+                                        "High risk detected. This opportunity shows multiple warning signs of a potential scam. Avoid sharing personal details or making any payments. Verify company authenticity through official websites and trusted sources before proceeding."
+                                      )}
+                                    </p>
+                                  </div>
                                 </div>
 
                                 <div className="mt-6 pt-6 border-t border-black/10 dark:border-white/10">
