@@ -183,9 +183,27 @@ export default function HomePage() {
       const keywords = criterion.keywords?.toLowerCase().split(',').map(k => k.trim()) || [];
       let detected = false;
 
-      // Payment criterion - only detect if payment-related keywords are present
+      // Payment criterion - refined detection to avoid false positives
       if (criterionName.includes('payment') || criterionName.includes('upfront')) {
-        detected = keywords.some(keyword => textLower.includes(keyword));
+        // Only detect if there's a clear payment REQUEST pattern
+        // Look for combinations of payment keywords with action/request words
+        const paymentRequestPatterns = [
+          /\b(pay|payment|deposit|fee|charge|cost)\s+(required|needed|must|should|necessary|mandatory|expected|demanded)/i,
+          /\b(require|need|must|should|expect|demand)\s+\w*\s*(pay|payment|deposit|fee|charge|cost)/i,
+          /\b(upfront|advance|initial|registration|processing|training)\s+(pay|payment|deposit|fee|charge|cost)/i,
+          /\b(pay|payment|deposit|fee|charge|cost)\s+(upfront|advance|initial|first|before|prior)/i,
+          /\b(send|transfer|wire|remit)\s+\w*\s*(money|payment|amount|funds)/i,
+          /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i
+        ];
+        
+        detected = paymentRequestPatterns.some(pattern => pattern.test(inputText));
+        
+        // Additional check: if basic keywords match, verify it's not just about salary/compensation
+        if (!detected && keywords.some(keyword => textLower.includes(keyword))) {
+          // Check if it's in context of a request/demand (not just mentioning payment/salary)
+          const contextualCheck = /(you must|you need to|you should|please|kindly|required to)\s+.{0,50}(pay|payment|fee|deposit|charge)/i;
+          detected = contextualCheck.test(inputText);
+        }
       }
       // Urgency/Pressure criterion
       else if (criterionName.includes('urgency') || criterionName.includes('pressure')) {
