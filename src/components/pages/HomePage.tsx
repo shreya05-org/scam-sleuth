@@ -115,24 +115,167 @@ export default function HomePage() {
     setSalaryRanges(ranges);
   };
 
-  // --- Logic (Preserved) ---
-  const checkSalaryAnomalies = (text: string): boolean => {
+  // --- Logic (Enhanced Detection) ---
+  
+  // Enhanced Salary Anomaly Detection
+  const checkSalaryAnomalies = (text: string): { detected: boolean; details: string } => {
     const salaryPatterns = [
-      /₹\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lpa|lakh|lakhs|per annum|pa)?/gi,
-      /\$\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/gi,
-      /€\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/gi,
-      /£\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)?/gi,
-      /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lpa|lakh|lakhs)/gi
+      { pattern: /₹\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lpa|lakh|lakhs|per annum|pa)/gi, currency: 'INR', multiplier: 100000 },
+      { pattern: /\$\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'USD', multiplier: 1000 },
+      { pattern: /€\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'EUR', multiplier: 1000 },
+      { pattern: /£\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'GBP', multiplier: 1000 },
+      { pattern: /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lpa|lakh|lakhs)/gi, currency: 'INR', multiplier: 100000 }
     ];
 
-    for (const pattern of salaryPatterns) {
+    const detectedSalaries: Array<{ amount: number; currency: string; original: string }> = [];
+
+    for (const { pattern, currency, multiplier } of salaryPatterns) {
       const matches = text.matchAll(pattern);
       for (const match of matches) {
-        const amount = parseFloat(match[1].replace(/,/g, ''));
-        if (amount > 50) return true;
+        const amount = parseFloat(match[1].replace(/,/g, '')) * multiplier;
+        detectedSalaries.push({ amount, currency, original: match[0] });
       }
     }
-    return false;
+
+    // Check against job role salary ranges from CMS
+    const textLower = text.toLowerCase();
+    let isAnomalous = false;
+    let anomalyDetails = '';
+
+    for (const salary of detectedSalaries) {
+      // Find matching job role in salary ranges
+      const matchingRole = salaryRanges.find(role => {
+        const roleTitle = role.jobRoleTitle?.toLowerCase() || '';
+        return roleTitle && textLower.includes(roleTitle);
+      });
+
+      if (matchingRole) {
+        const minSalary = matchingRole.minSalary || 0;
+        const maxSalary = matchingRole.maxSalary || 0;
+        
+        // Convert to comparable units (assuming INR for comparison)
+        let comparableSalary = salary.amount;
+        if (salary.currency === 'USD') comparableSalary *= 83; // Approximate conversion
+        if (salary.currency === 'EUR') comparableSalary *= 90;
+        if (salary.currency === 'GBP') comparableSalary *= 105;
+
+        // Check if salary is significantly higher than market range (>50% above max)
+        if (comparableSalary > maxSalary * 1.5) {
+          isAnomalous = true;
+          anomalyDetails = `Salary ${salary.original} significantly exceeds market range for ${matchingRole.jobRoleTitle} (₹${minSalary}-₹${maxSalary} ${matchingRole.payPeriod})`;
+          break;
+        }
+      } else {
+        // No specific role found, use general threshold
+        // Flag if INR > 50 LPA, USD > 200k, EUR > 180k, GBP > 150k
+        const thresholds = { INR: 5000000, USD: 200000, EUR: 180000, GBP: 150000 };
+        if (salary.amount > thresholds[salary.currency as keyof typeof thresholds]) {
+          isAnomalous = true;
+          anomalyDetails = `Unusually high salary offer (${salary.original}) without clear job role specification`;
+          break;
+        }
+      }
+    }
+
+    return { detected: isAnomalous, details: anomalyDetails };
+  };
+
+  // Enhanced Urgency/Pressure Detection
+  const checkUrgencyPressure = (text: string, keywords: string[]): boolean => {
+    const textLower = text.toLowerCase();
+    
+    // Pattern 1: Time-pressure phrases
+    const timePressurePatterns = [
+      /\b(immediate|urgent|asap|right away|right now|today|within \d+ (hours?|days?))\b/i,
+      /\b(limited (time|spots?|positions?|openings?))\b/i,
+      /\b(act (now|fast|quickly|immediately))\b/i,
+      /\b(offer expires?|deadline|last chance|final (call|opportunity))\b/i,
+      /\b(hurry|rush|don't (wait|delay|miss))\b/i,
+      /\b(only \d+ (spots?|positions?|openings?) (left|remaining|available))\b/i
+    ];
+
+    // Pattern 2: Pressure tactics
+    const pressureTactics = [
+      /\b(must (respond|reply|apply|act|decide)|you (must|need to|have to) (respond|reply|apply|act|decide))\b/i,
+      /\b(confirm (immediately|now|today|asap))\b/i,
+      /\b(this is your (only|last) (chance|opportunity))\b/i,
+      /\b(won't get (another|this) (chance|opportunity))\b/i,
+      /\b(decision (required|needed) (immediately|now|today))\b/i
+    ];
+
+    // Pattern 3: Artificial scarcity
+    const scarcityPatterns = [
+      /\b(filling fast|almost full|nearly full)\b/i,
+      /\b(high demand|overwhelming response)\b/i,
+      /\b(selected (few|candidates?))\b/i,
+      /\b(exclusive (offer|opportunity))\b/i
+    ];
+
+    // Check if any patterns match
+    const hasTimePressure = timePressurePatterns.some(pattern => pattern.test(text));
+    const hasPressureTactics = pressureTactics.some(pattern => pattern.test(text));
+    const hasScarcity = scarcityPatterns.some(pattern => pattern.test(text));
+    
+    // Also check basic keywords
+    const hasKeywords = keywords.some(keyword => textLower.includes(keyword));
+
+    // Detected if multiple indicators present or strong single indicator
+    return (hasTimePressure && (hasPressureTactics || hasScarcity || hasKeywords)) || 
+           (hasPressureTactics && hasScarcity) ||
+           (hasKeywords && (hasTimePressure || hasPressureTactics));
+  };
+
+  // Enhanced External Messaging Detection
+  const checkExternalMessaging = (text: string, keywords: string[]): boolean => {
+    const textLower = text.toLowerCase();
+    
+    // Pattern 1: Direct requests to move off-platform
+    const offPlatformPatterns = [
+      /\b(contact (me|us) (on|via|through|at))\s+(whatsapp|telegram|signal|wechat|email|phone)/i,
+      /\b(message (me|us) (on|via|through|at))\s+(whatsapp|telegram|signal|wechat)/i,
+      /\b(reach out (on|via|through))\s+(whatsapp|telegram|signal|wechat|email)/i,
+      /\b(add (me|us) on)\s+(whatsapp|telegram|signal|wechat)/i,
+      /\b(text (me|us) (on|at))\s+\d{10}/i,
+      /\b(call (me|us) (on|at))\s+\d{10}/i
+    ];
+
+    // Pattern 2: Providing external contact details
+    const contactDetailsPatterns = [
+      /\b(my|our) (whatsapp|telegram|signal|wechat|email|phone|number)\s*(is|:|-)?\s*[\d@]/i,
+      /\b(whatsapp|telegram|signal|wechat)\s*(number|id|contact)\s*[:|-]?\s*[\d+]/i,
+      /\b(email|e-mail)\s*(me|us)?\s*(at|:|-)?\s*[\w.-]+@[\w.-]+\.\w+/i,
+      /\b\d{10,}\b.*\b(whatsapp|telegram|call|text|message)/i
+    ];
+
+    // Pattern 3: Urgency to move communication
+    const urgentMovePatterns = [
+      /\b(please|kindly|quickly|immediately)\s+.{0,30}(whatsapp|telegram|email|call|text|message)/i,
+      /\b(respond|reply|contact)\s+.{0,20}(whatsapp|telegram|email|directly)/i,
+      /\b(continue|proceed)\s+.{0,20}(whatsapp|telegram|email|off-?platform)/i
+    ];
+
+    // Pattern 4: Avoiding official channels
+    const avoidOfficialPatterns = [
+      /\b(don't|do not|avoid)\s+.{0,30}(reply|respond|use)\s+.{0,30}(this platform|here|job (board|site|portal))/i,
+      /\b(easier|better|faster|quicker)\s+.{0,30}(whatsapp|telegram|email|directly)/i,
+      /\b(official|company)\s+.{0,30}(communication|process)\s+.{0,30}(whatsapp|telegram|email)/i
+    ];
+
+    // Check patterns
+    const hasOffPlatform = offPlatformPatterns.some(pattern => pattern.test(text));
+    const hasContactDetails = contactDetailsPatterns.some(pattern => pattern.test(text));
+    const hasUrgentMove = urgentMovePatterns.some(pattern => pattern.test(text));
+    const hasAvoidOfficial = avoidOfficialPatterns.some(pattern => pattern.test(text));
+    
+    // Check basic keywords
+    const hasKeywords = keywords.some(keyword => textLower.includes(keyword));
+
+    // Detected if explicit off-platform request or multiple indicators
+    return hasOffPlatform || 
+           hasContactDetails || 
+           (hasUrgentMove && hasKeywords) || 
+           (hasAvoidOfficial && hasKeywords) ||
+           (hasKeywords && (hasUrgentMove || hasContactDetails));
   };
 
   const getRecommendations = (riskLevel: string, flags: DetectedFlag[]): string[] => {
@@ -177,11 +320,12 @@ export default function HomePage() {
     let totalRisk = 0;
     const textLower = inputText.toLowerCase();
 
-    // Check each criterion with specific logic
+    // Check each criterion with enhanced logic
     redFlagCriteria.forEach(criterion => {
       const criterionName = criterion.name?.toLowerCase() || '';
       const keywords = criterion.keywords?.toLowerCase().split(',').map(k => k.trim()) || [];
       let detected = false;
+      let customExplanation = criterion.explanation || '';
 
       // Payment criterion - enhanced detection for tuition, fees, and payment requests
       if (criterionName.includes('payment') || criterionName.includes('upfront')) {
@@ -218,13 +362,13 @@ export default function HomePage() {
           detected = contextualCheck.test(inputText);
         }
       }
-      // Urgency/Pressure criterion
+      // Urgency/Pressure criterion - enhanced detection
       else if (criterionName.includes('urgency') || criterionName.includes('pressure')) {
-        detected = keywords.some(keyword => textLower.includes(keyword));
+        detected = checkUrgencyPressure(inputText, keywords);
       }
-      // External messaging criterion
+      // External messaging criterion - enhanced detection
       else if (criterionName.includes('messaging') || criterionName.includes('external')) {
-        detected = keywords.some(keyword => textLower.includes(keyword));
+        detected = checkExternalMessaging(inputText, keywords);
       }
       // For any other criteria, check keywords normally
       else {
@@ -237,16 +381,16 @@ export default function HomePage() {
         detectedFlags.push({
           name: criterion.name || '',
           detected: true,
-          explanation: criterion.explanation || '',
+          explanation: customExplanation,
           riskContribution: contribution,
           severityLevel: criterion.severityLevel || 'medium'
         });
       }
     });
 
-    // Check for salary anomalies separately
-    const salaryDetected = checkSalaryAnomalies(inputText);
-    if (salaryDetected) {
+    // Check for salary anomalies separately with enhanced logic
+    const salaryCheck = checkSalaryAnomalies(inputText);
+    if (salaryCheck.detected) {
       const salaryCriterion = redFlagCriteria.find(c => c.name?.toLowerCase().includes('salary'));
       if (salaryCriterion) {
         // Only add if not already detected
@@ -257,7 +401,7 @@ export default function HomePage() {
           detectedFlags.push({
             name: salaryCriterion.name || 'Salary Anomaly',
             detected: true,
-            explanation: salaryCriterion.explanation || 'Unrealistic salary detected',
+            explanation: salaryCheck.details || salaryCriterion.explanation || 'Unrealistic salary detected',
             riskContribution: contribution,
             severityLevel: salaryCriterion.severityLevel || 'medium'
           });
