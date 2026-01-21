@@ -236,7 +236,8 @@ export default function HomePage() {
       /\b(reach out (on|via|through))\s+(whatsapp|telegram|signal|wechat|email)/i,
       /\b(add (me|us) on)\s+(whatsapp|telegram|signal|wechat)/i,
       /\b(text (me|us) (on|at))\s+\d{10}/i,
-      /\b(call (me|us) (on|at))\s+\d{10}/i
+      /\b(call (me|us) (on|at))\s+\d{10}/i,
+      /\b(interested|candidates?|applicants?)\s+(?:please|kindly)?\s*(message|contact|reach|text|call|email)\s+(?:me|us)?\s*(?:on|via|at|directly)/i
     ];
 
     // Pattern 2: Providing external contact details
@@ -358,14 +359,26 @@ export default function HomePage() {
           detected = tuitionFeePatterns.some(pattern => pattern.test(inputText));
         }
         
-        // Pattern 3: Contextual payment demands (if basic keywords match)
+        // Pattern 3: Deferred payment/compensation discussions (work before pay clarity)
+        const deferredPaymentPatterns = [
+          /\b(salary|stipend|compensation|payment|pay)\s+(?:will be|to be|can be)?\s*(discussed|negotiated|decided|determined|shared|revealed)\s+(?:after|later|upon|following)/i,
+          /\b(discussed|negotiated|decided|determined|shared|revealed)\s+(?:after|later|upon|following)\s+.{0,30}(task|assignment|work|project|submission|completion)/i,
+          /\b(compensation|payment|stipend|salary)\s+(?:details|information|amount)?\s*(will be|to be)?\s*(discussed|shared|provided|revealed)\s+later/i,
+          /\b(after|upon|following)\s+.{0,20}(task|assignment|work|project|submission)\s+.{0,30}(discuss|share|reveal|determine)\s+.{0,20}(compensation|payment|stipend|salary)/i
+        ];
+        
+        if (!detected) {
+          detected = deferredPaymentPatterns.some(pattern => pattern.test(inputText));
+        }
+        
+        // Pattern 4: Contextual payment demands (if basic keywords match)
         if (!detected && keywords.some(keyword => textLower.includes(keyword))) {
           // Check if it's in context of a request/demand (not just mentioning salary/compensation)
           const contextualCheck = /(you must|you need to|you should|please|kindly|required to|have to|will need to)\s+.{0,50}(pay|payment|fee|deposit|charge)/i;
           detected = contextualCheck.test(inputText);
         }
         
-        // Pattern 4: Any mention of payment/fee in job context (broadest catch)
+        // Pattern 5: Any mention of payment/fee in job context (broadest catch)
         if (!detected) {
           // Check for any fee/payment mention that's not about salary being paid TO the candidate
           const broadPaymentCheck = /\b(fee|charge|deposit|payment|cost)\b/i;
