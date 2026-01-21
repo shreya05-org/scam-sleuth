@@ -119,15 +119,17 @@ export default function HomePage() {
   
   // CATEGORY 1: Payment/Monetization Detection (even indirect)
   const checkPaymentIndicators = (text: string): { detected: boolean; details: string } => {
-    const textLower = text.toLowerCase();
-    
     // Direct payment requests
     const directPaymentPatterns = [
       /\b(pay|payment|deposit|fee|charge|cost)\s+(required|needed|must|should|necessary|mandatory|expected|demanded)/i,
       /\b(require|need|must|should|expect|demand)\s+\w*\s*(pay|payment|deposit|fee|charge|cost)/i,
       /\b(upfront|advance|initial|registration|processing|training)\s+(pay|payment|deposit|fee|charge|cost)/i,
       /\b(send|transfer|wire|remit)\s+\w*\s*(money|payment|amount|funds)/i,
-      /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i
+      /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i,
+      /\b(complete|make|submit)\s+(?:a\s+)?payment/i,
+      /\bpayment\s+(?:of|is)\s+(?:₹|£|\$|€)?\s*\d+/i,
+      /\b(?:₹|rs\.?|rupees?)\s*\d[\d,]+\s+(?:to|for)\s+(?:fast-track|onboarding|registration|training|processing)/i,
+      /\bcandidates?\s+must\s+complete\s+(?:a\s+)?payment/i
     ];
     
     // Tuition & training fees (including discounts/scholarships)
@@ -186,7 +188,9 @@ export default function HomePage() {
       /\b(closing today|ends today|expires today)/i,
       /\b(deadline approaching|time running out)/i,
       /\b(early registration|early application)\s+(?:is)?\s*(encouraged|recommended|advised)/i,
-      /\b(risk falling behind|don't fall behind)\s+(?:your)?\s*peers/i
+      /\b(risk falling behind|don't fall behind)\s+(?:your)?\s*peers/i,
+      /\b(?:respond|reply|apply)\s+within\s+\d+\s+(?:days?|hours?|weeks?)/i,
+      /\b(?:failure|fail)\s+to\s+(?:respond|reply|apply)\s+(?:within|by|before)/i
     ];
 
     // Pressure tactics
@@ -196,7 +200,9 @@ export default function HomePage() {
       /\b(failure to respond|if you don't respond)\s+(?:will)?\s*(cancel|forfeit|lose)/i,
       /\b(must (respond|reply|apply|register|confirm))/i,
       /\b(you (must|need to|have to)\s+(respond|apply|register|confirm))/i,
-      /\b(this is your (?:only|last) (?:chance|opportunity))/i
+      /\b(this is your (?:only|last) (?:chance|opportunity))/i,
+      /\b(?:will\s+)?result\s+in\s+(?:automatic\s+)?(?:disqualification|rejection|cancellation)/i,
+      /\b(?:mandatory|required)\s+(?:and|&)\s+non-negotiable/i
     ];
 
     // Scarcity framing
