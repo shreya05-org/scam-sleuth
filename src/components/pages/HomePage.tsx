@@ -115,20 +115,197 @@ export default function HomePage() {
     setSalaryRanges(ranges);
   };
 
-  // --- Logic (Enhanced Detection) ---
+  // --- Logic (Enhanced Multi-Criteria Detection) ---
   
-  // Enhanced Salary Anomaly Detection
+  // CATEGORY 1: Payment/Monetization Detection (even indirect)
+  const checkPaymentIndicators = (text: string): { detected: boolean; details: string } => {
+    const textLower = text.toLowerCase();
+    
+    // Direct payment requests
+    const directPaymentPatterns = [
+      /\b(pay|payment|deposit|fee|charge|cost)\s+(required|needed|must|should|necessary|mandatory|expected|demanded)/i,
+      /\b(require|need|must|should|expect|demand)\s+\w*\s*(pay|payment|deposit|fee|charge|cost)/i,
+      /\b(upfront|advance|initial|registration|processing|training)\s+(pay|payment|deposit|fee|charge|cost)/i,
+      /\b(send|transfer|wire|remit)\s+\w*\s*(money|payment|amount|funds)/i,
+      /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i
+    ];
+    
+    // Tuition & training fees (including discounts/scholarships)
+    const tuitionFeePatterns = [
+      /\b(tuition|course fee|training fee|enrollment fee|admission fee|certification fee|program fee|registration fee)/i,
+      /\b\d+\s*(?:percent|%)\s+(tuition|fee|cost)?\s*(reduction|discount|waiver|scholarship)/i,
+      /\b(reduced|discounted)\s+(tuition|fee|cost)/i,
+      /\b(scholarship code|discount code|promo code|coupon code)\s+(?:to|for)?\s*(get|receive|claim)/i,
+      /\b(use code|apply code|enter code)\s+(?:to)?\s*(get|receive)\s+(?:a)?\s*(discount|reduction)/i,
+      /\brefundable\s+(fee|deposit|payment)/i,
+      /\bpaid\s+(program|internship|training|course)/i
+    ];
+    
+    // Deferred payment/compensation discussions
+    const deferredPaymentPatterns = [
+      /\b(salary|stipend|compensation|payment|pay)\s+(?:will be|to be|can be)?\s*(discussed|negotiated|decided|determined|shared|revealed)\s+(?:after|later|upon|following)/i,
+      /\b(compensation|payment|stipend|salary)\s+(?:details|information|amount)?\s*(?:will be|to be)?\s*(discussed|shared|provided|revealed)\s+later/i,
+      /\b(pay after|payment after|stipend after)\s+(selection|joining|task|assignment|completion)/i,
+      /\bcompensation\s+discussed\s+after\s+task/i
+    ];
+    
+    // Monetized internship/training model
+    const monetizedModelPatterns = [
+      /\bmonetized\s+(internship|training|program)/i,
+      /\b(internship|training)\s+(?:with)?\s*(?:a)?\s*fee/i,
+      /\b(earn while you learn|learn and earn)\b/i,
+      /\b(investment|fee)\s+(?:in|for)\s+(?:your)?\s*(career|future|training)/i
+    ];
+
+    const hasDirectPayment = directPaymentPatterns.some(p => p.test(text));
+    const hasTuitionFee = tuitionFeePatterns.some(p => p.test(text));
+    const hasDeferredPayment = deferredPaymentPatterns.some(p => p.test(text));
+    const hasMonetizedModel = monetizedModelPatterns.some(p => p.test(text));
+
+    const detected = hasDirectPayment || hasTuitionFee || hasDeferredPayment || hasMonetizedModel;
+    
+    let details = '';
+    if (detected) {
+      if (hasDirectPayment) details = 'Direct payment request detected in job posting';
+      else if (hasTuitionFee) details = 'Tuition/training fee structure detected - legitimate jobs should not require payment';
+      else if (hasDeferredPayment) details = 'Compensation details deferred until after work/task completion';
+      else if (hasMonetizedModel) details = 'Monetized internship/training model detected';
+    }
+
+    return { detected, details };
+  };
+
+  // CATEGORY 2: Urgency & Psychological Pressure Detection
+  const checkUrgencyPressure = (text: string): { detected: boolean; details: string } => {
+    // Time-pressure phrases
+    const timePressurePatterns = [
+      /\b(last date|final date|deadline|closing date)\s+(?:to|for)?\s*(apply|register|submit|fill)/i,
+      /\b(limited seats?|finite seats?|only \d+ seats?)\b/i,
+      /\b(act fast|apply immediately|register now|submit today)/i,
+      /\b(filling fast|seats? filling|almost full)/i,
+      /\b(closing today|ends today|expires today)/i,
+      /\b(deadline approaching|time running out)/i,
+      /\b(early registration|early application)\s+(?:is)?\s*(encouraged|recommended|advised)/i,
+      /\b(risk falling behind|don't fall behind)\s+(?:your)?\s*peers/i
+    ];
+
+    // Pressure tactics
+    const pressureTactics = [
+      /\b(confirm today|respond today|apply today|register today)/i,
+      /\b(attendance\s+(?:is)?\s*mandatory|mandatory attendance)/i,
+      /\b(failure to respond|if you don't respond)\s+(?:will)?\s*(cancel|forfeit|lose)/i,
+      /\b(must (respond|reply|apply|register|confirm))/i,
+      /\b(you (must|need to|have to)\s+(respond|apply|register|confirm))/i,
+      /\b(this is your (?:only|last) (?:chance|opportunity))/i
+    ];
+
+    // Scarcity framing
+    const scarcityPatterns = [
+      /\b(rolling basis|first come first serve)\s+(?:with)?\s*(limited|finite|few)/i,
+      /\b(high demand|overwhelming response)/i,
+      /\b(selected few|exclusive opportunity|limited opportunity)/i,
+      /\b(you have been selected|congratulations.{0,30}selected)/i,
+      /\b(limited to (?:the )?first \d+)/i
+    ];
+
+    const hasTimePressure = timePressurePatterns.some(p => p.test(text));
+    const hasPressureTactics = pressureTactics.some(p => p.test(text));
+    const hasScarcity = scarcityPatterns.some(p => p.test(text));
+
+    const detected = hasTimePressure || hasPressureTactics || hasScarcity;
+    
+    let details = '';
+    if (detected) {
+      if (hasTimePressure) details = 'Urgency language detected - creating artificial time pressure';
+      else if (hasPressureTactics) details = 'Psychological pressure tactics detected - forcing immediate action';
+      else if (hasScarcity) details = 'Artificial scarcity framing detected - manipulating decision-making';
+    }
+
+    return { detected, details };
+  };
+
+  // CATEGORY 3: Off-Platform/External Communication Detection
+  const checkExternalMessaging = (text: string): { detected: boolean; details: string } => {
+    // Direct off-platform requests
+    const offPlatformPatterns = [
+      /\b(contact|message|reach|text|call)\s+(?:me|us)?\s*(?:on|via|through|at|directly)\s+(whatsapp|telegram|signal|wechat|email|phone)/i,
+      /\b(whatsapp|telegram|signal|wechat)\s+(?:me|us)\s+(?:on|at)/i,
+      /\b(add (?:me|us) on)\s+(whatsapp|telegram|signal)/i
+    ];
+
+    // External contact details & Google Forms
+    const contactDetailsPatterns = [
+      /\b(whatsapp|telegram|signal|wechat)\s*(?:number|id|contact)?\s*[:|-]?\s*[+]?\d{10}/i,
+      /\b(?:email|e-mail)\s*(?:me|us)?\s*(?:at|:|-)\s*[\w.-]+@[\w.-]+\.\w+/i,
+      /\b(forms\.gle|docs\.google\.com\/forms)\b/i,
+      /\bhttps?:\/\/forms\.gle\/[a-zA-Z0-9]+/i,
+      /\b(fill (?:the|this|out) (?:form|application|google form))/i,
+      /\b(application form|registration form)\s+(?:link|below|here)/i
+    ];
+
+    // Avoiding official channels
+    const avoidOfficialPatterns = [
+      /\b(don't|do not|avoid)\s+(?:reply|respond|use)\s+(?:this)?\s*(platform|portal|site|email)/i,
+      /\b(easier|better|faster|quicker)\s+(?:to|on)?\s*(whatsapp|telegram|email|directly)/i,
+      /\b(do not reply to this email|don't reply here)/i,
+      /\b(hr (?:will )?contact|counselor (?:will )?contact)\s+(?:you)?\s*(?:separately|directly)/i,
+      /\b(dm (?:me|us)|direct message)\s+(?:for)?\s*(faster|quick|immediate)/i
+    ];
+
+    const hasOffPlatform = offPlatformPatterns.some(p => p.test(text));
+    const hasContactDetails = contactDetailsPatterns.some(p => p.test(text));
+    const hasAvoidOfficial = avoidOfficialPatterns.some(p => p.test(text));
+
+    const detected = hasOffPlatform || hasContactDetails || hasAvoidOfficial;
+    
+    let details = '';
+    if (detected) {
+      if (hasOffPlatform) details = 'Attempt to move communication off-platform detected';
+      else if (hasContactDetails) details = 'External contact details or forms provided - bypassing official channels';
+      else if (hasAvoidOfficial) details = 'Instructions to avoid official communication channels detected';
+    }
+
+    return { detected, details };
+  };
+
+  // CATEGORY 4: Salary/Benefit Anomalies & Role Mismatch Detection
   const checkSalaryAnomalies = (text: string): { detected: boolean; details: string } => {
+    const textLower = text.toLowerCase();
+    
+    // Unrealistic guarantees
+    const guaranteePatterns = [
+      /\b(guaranteed|100%)\s+(internship|placement|job|selection)/i,
+      /\b(100% placement|placement guarantee|guaranteed placement)/i,
+      /\b(no interview|direct selection|automatic selection)/i,
+      /\b(selected without interview)/i
+    ];
+
+    // Unrealistic benefits
+    const benefitPatterns = [
+      /\b(highest package|top package|premium package)/i,
+      /\b(earn while you learn|learn and earn)/i,
+      /\b(international client exposure)\s+(?:for)?\s*(?:freshers?|beginners?|no experience)/i,
+      /\b(work from home|remote)\s+(?:with)?\s*(no experience|fresher|beginner)/i,
+      /\b(multiple certificates?)\s+(?:in)?\s*(?:short|few|limited)\s+(?:duration|time|days?|weeks?)/i
+    ];
+
+    // Placement assurance language
+    const placementPatterns = [
+      /\bplacement assurance\b/i,
+      /\bassured placement\b/i,
+      /\bguaranteed job after\b/i,
+      /\b100%\s+(?:job|placement)\b/i
+    ];
+
+    // Numeric salary anomalies (existing logic)
     const salaryPatterns = [
       { pattern: /₹\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lpa|lakh|lakhs|per annum|pa)/gi, currency: 'INR', multiplier: 100000 },
       { pattern: /\$\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'USD', multiplier: 1000 },
       { pattern: /€\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'EUR', multiplier: 1000 },
-      { pattern: /£\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'GBP', multiplier: 1000 },
-      { pattern: /(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lpa|lakh|lakhs)/gi, currency: 'INR', multiplier: 100000 }
+      { pattern: /£\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:k|thousand)/gi, currency: 'GBP', multiplier: 1000 }
     ];
 
     const detectedSalaries: Array<{ amount: number; currency: string; original: string }> = [];
-
     for (const { pattern, currency, multiplier } of salaryPatterns) {
       const matches = text.matchAll(pattern);
       for (const match of matches) {
@@ -137,42 +314,48 @@ export default function HomePage() {
       }
     }
 
-    // Check against job role salary ranges from CMS
-    const textLower = text.toLowerCase();
-    let isAnomalous = false;
+    const hasGuarantees = guaranteePatterns.some(p => p.test(text));
+    const hasBenefits = benefitPatterns.some(p => p.test(text));
+    const hasPlacement = placementPatterns.some(p => p.test(text));
+
+    let isAnomalous = hasGuarantees || hasBenefits || hasPlacement;
     let anomalyDetails = '';
 
-    for (const salary of detectedSalaries) {
-      // Find matching job role in salary ranges
-      const matchingRole = salaryRanges.find(role => {
-        const roleTitle = role.jobRoleTitle?.toLowerCase() || '';
-        return roleTitle && textLower.includes(roleTitle);
-      });
+    if (hasGuarantees) {
+      anomalyDetails = 'Unrealistic guarantees detected - legitimate employers cannot guarantee placements without proper evaluation';
+    } else if (hasBenefits) {
+      anomalyDetails = 'Unrealistic benefits or role mismatch detected - claims do not align with typical job market practices';
+    } else if (hasPlacement) {
+      anomalyDetails = 'Placement assurance language detected - legitimate companies do not guarantee jobs before assessment';
+    }
 
-      if (matchingRole) {
-        const minSalary = matchingRole.minSalary || 0;
-        const maxSalary = matchingRole.maxSalary || 0;
-        
-        // Convert to comparable units (assuming INR for comparison)
-        let comparableSalary = salary.amount;
-        if (salary.currency === 'USD') comparableSalary *= 83; // Approximate conversion
-        if (salary.currency === 'EUR') comparableSalary *= 90;
-        if (salary.currency === 'GBP') comparableSalary *= 105;
+    // Check numeric salary anomalies
+    if (!isAnomalous && detectedSalaries.length > 0) {
+      for (const salary of detectedSalaries) {
+        const matchingRole = salaryRanges.find(role => {
+          const roleTitle = role.jobRoleTitle?.toLowerCase() || '';
+          return roleTitle && textLower.includes(roleTitle);
+        });
 
-        // Check if salary is significantly higher than market range (>50% above max)
-        if (comparableSalary > maxSalary * 1.5) {
-          isAnomalous = true;
-          anomalyDetails = `Salary ${salary.original} significantly exceeds market range for ${matchingRole.jobRoleTitle} (₹${minSalary}-₹${maxSalary} ${matchingRole.payPeriod})`;
-          break;
-        }
-      } else {
-        // No specific role found, use general threshold
-        // Flag if INR > 50 LPA, USD > 200k, EUR > 180k, GBP > 150k
-        const thresholds = { INR: 5000000, USD: 200000, EUR: 180000, GBP: 150000 };
-        if (salary.amount > thresholds[salary.currency as keyof typeof thresholds]) {
-          isAnomalous = true;
-          anomalyDetails = `Unusually high salary offer (${salary.original}) without clear job role specification`;
-          break;
+        if (matchingRole) {
+          const maxSalary = matchingRole.maxSalary || 0;
+          let comparableSalary = salary.amount;
+          if (salary.currency === 'USD') comparableSalary *= 83;
+          if (salary.currency === 'EUR') comparableSalary *= 90;
+          if (salary.currency === 'GBP') comparableSalary *= 105;
+
+          if (comparableSalary > maxSalary * 1.5) {
+            isAnomalous = true;
+            anomalyDetails = `Salary ${salary.original} significantly exceeds market range for ${matchingRole.jobRoleTitle}`;
+            break;
+          }
+        } else {
+          const thresholds = { INR: 5000000, USD: 200000, EUR: 180000, GBP: 150000 };
+          if (salary.amount > thresholds[salary.currency as keyof typeof thresholds]) {
+            isAnomalous = true;
+            anomalyDetails = `Unusually high salary offer (${salary.original}) without clear job role specification`;
+            break;
+          }
         }
       }
     }
@@ -180,129 +363,7 @@ export default function HomePage() {
     return { detected: isAnomalous, details: anomalyDetails };
   };
 
-  // Enhanced Urgency/Pressure Detection
-  const checkUrgencyPressure = (text: string, keywords: string[]): boolean => {
-    const textLower = text.toLowerCase();
-    
-    // Pattern 1: Time-pressure phrases (ENHANCED)
-    const timePressurePatterns = [
-      /\b(immediate|urgent|asap|right away|right now|today|within \d+ (hours?|days?))\b/i,
-      /\b(limited (time|spots?|positions?|openings?|seats?))\b/i,
-      /\b(act (now|fast|quickly|immediately))\b/i,
-      /\b(offer expires?|deadline|last (chance|date|day)|final (call|opportunity))\b/i,
-      /\b(hurry|rush|don't (wait|delay|miss))\b/i,
-      /\b(only \d+ (spots?|positions?|openings?|seats?) (left|remaining|available))\b/i,
-      /\b(last date to (fill|apply|register|submit))\b/i,
-      /\b(finite seats?|limited seats?)\b/i,
-      /\b(early (registration|submission|application) (is )?(highly )?(recommended|encouraged|advised))\b/i,
-      /\b(applications? (are )?reviewed on a rolling basis)\b/i,
-      /\b(seats? (are )?filling (fast|quickly))\b/i,
-      /\b(don't (miss|delay)|risk falling behind)\b/i,
-      /\b(next batch starts?|batch (starting|begins))\b/i,
-      /\b(if you don't (join|apply|register) now)\b/i
-    ];
 
-    // Pattern 2: Pressure tactics (ENHANCED)
-    const pressureTactics = [
-      /\b(must (respond|reply|apply|act|decide|fill|register|submit)|you (must|need to|have to) (respond|reply|apply|act|decide|fill|register|submit))\b/i,
-      /\b(confirm (immediately|now|today|asap))\b/i,
-      /\b(this is your (only|last) (chance|opportunity))\b/i,
-      /\b(won't get (another|this) (chance|opportunity))\b/i,
-      /\b(decision (required|needed) (immediately|now|today))\b/i,
-      /\b(make sure you (guys are )?filling)\b/i,
-      /\b(ensure that you enter|essential that no one misses)\b/i,
-      /\b(without (any )?delay)\b/i,
-      /\b(attendance .{0,20}mandatory)\b/i
-    ];
-
-    // Pattern 3: Artificial scarcity (ENHANCED)
-    const scarcityPatterns = [
-      /\b(filling fast|almost full|nearly full)\b/i,
-      /\b(high demand|overwhelming response)\b/i,
-      /\b(selected (few|candidates?))\b/i,
-      /\b(exclusive (offer|opportunity))\b/i,
-      /\b(limited to (the )?first \d+)\b/i,
-      /\b(finite (seats?|spots?|positions?))\b/i,
-      /\b(you have been selected)\b/i,
-      /\b(congratulations.{0,30}selected)\b/i
-    ];
-
-    // Check if any patterns match
-    const hasTimePressure = timePressurePatterns.some(pattern => pattern.test(text));
-    const hasPressureTactics = pressureTactics.some(pattern => pattern.test(text));
-    const hasScarcity = scarcityPatterns.some(pattern => pattern.test(text));
-    
-    // Also check basic keywords
-    const hasKeywords = keywords.some(keyword => textLower.includes(keyword));
-
-    // Detected if ANY strong indicator present (lowered threshold)
-    return hasTimePressure || 
-           hasPressureTactics || 
-           hasScarcity ||
-           (hasKeywords && (hasTimePressure || hasPressureTactics || hasScarcity));
-  };
-
-  // Enhanced External Messaging Detection
-  const checkExternalMessaging = (text: string, keywords: string[]): boolean => {
-    const textLower = text.toLowerCase();
-    
-    // Pattern 1: Direct requests to move off-platform (ENHANCED)
-    const offPlatformPatterns = [
-      /\b(contact (me|us) (on|via|through|at))\s+(whatsapp|telegram|signal|wechat|email|phone)/i,
-      /\b(message (me|us) (on|via|through|at))\s+(whatsapp|telegram|signal|wechat)/i,
-      /\b(reach out (on|via|through))\s+(whatsapp|telegram|signal|wechat|email)/i,
-      /\b(add (me|us) on)\s+(whatsapp|telegram|signal|wechat)/i,
-      /\b(text (me|us) (on|at))\s+\d{10}/i,
-      /\b(call (me|us) (on|at))\s+\d{10}/i,
-      /\b(interested|candidates?|applicants?)\s+(?:please|kindly)?\s*(message|contact|reach|text|call|email)\s+(?:me|us)?\s*(?:on|via|at|directly)/i
-    ];
-
-    // Pattern 2: Providing external contact details (ENHANCED - detect Google Forms)
-    const contactDetailsPatterns = [
-      /\b(my|our) (whatsapp|telegram|signal|wechat|email|phone|number)\s*(is|:|-)?\s*[\d@]/i,
-      /\b(whatsapp|telegram|signal|wechat)\s*(number|id|contact)\s*[:|-]?\s*[\d+]/i,
-      /\b(email|e-mail)\s*(me|us)?\s*(at|:|-)?\s*[\w.-]+@[\w.-]+\.\w+/i,
-      /\b\d{10,}\b.*\b(whatsapp|telegram|call|text|message)/i,
-      // Google Forms detection
-      /\b(forms\.gle|docs\.google\.com\/forms)\b/i,
-      /\b(fill (the|this|out) (form|application))\b/i,
-      /\b(application form|registration form|form link)\b/i,
-      /\bhttps?:\/\/forms\.gle\/[a-zA-Z0-9]+/i
-    ];
-
-    // Pattern 3: Urgency to move communication (ENHANCED)
-    const urgentMovePatterns = [
-      /\b(please|kindly|quickly|immediately)\s+.{0,30}(whatsapp|telegram|email|call|text|message|fill|apply|register)/i,
-      /\b(respond|reply|contact)\s+.{0,20}(whatsapp|telegram|email|directly)/i,
-      /\b(continue|proceed)\s+.{0,20}(whatsapp|telegram|email|off-?platform)/i,
-      /\b(fill (the|this) (form|application) (to|for|without fail))/i,
-      /\b(click (the|this) link)\b/i
-    ];
-
-    // Pattern 4: Avoiding official channels (ENHANCED)
-    const avoidOfficialPatterns = [
-      /\b(don't|do not|avoid)\s+.{0,30}(reply|respond|use)\s+.{0,30}(this platform|here|job (board|site|portal))/i,
-      /\b(easier|better|faster|quicker)\s+.{0,30}(whatsapp|telegram|email|directly)/i,
-      /\b(official|company)\s+.{0,30}(communication|process)\s+.{0,30}(whatsapp|telegram|email)/i,
-      /\b(external|third-party) (form|link|application|website)/i
-    ];
-
-    // Check patterns
-    const hasOffPlatform = offPlatformPatterns.some(pattern => pattern.test(text));
-    const hasContactDetails = contactDetailsPatterns.some(pattern => pattern.test(text));
-    const hasUrgentMove = urgentMovePatterns.some(pattern => pattern.test(text));
-    const hasAvoidOfficial = avoidOfficialPatterns.some(pattern => pattern.test(text));
-    
-    // Check basic keywords
-    const hasKeywords = keywords.some(keyword => textLower.includes(keyword));
-
-    // Detected if ANY strong indicator present (lowered threshold)
-    return hasOffPlatform || 
-           hasContactDetails || 
-           hasUrgentMove ||
-           hasAvoidOfficial ||
-           (hasKeywords && (hasUrgentMove || hasContactDetails));
-  };
 
   const getRecommendations = (riskLevel: string, flags: DetectedFlag[]): string[] => {
     const recommendations: string[] = [];
@@ -343,131 +404,87 @@ export default function HomePage() {
     await new Promise(resolve => setTimeout(resolve, 1200));
 
     const detectedFlags: DetectedFlag[] = [];
+    const categoriesTriggered: string[] = [];
     let totalRisk = 0;
-    const textLower = inputText.toLowerCase();
 
-    // Check each criterion with enhanced logic
-    redFlagCriteria.forEach(criterion => {
-      const criterionName = criterion.name?.toLowerCase() || '';
-      const keywords = criterion.keywords?.toLowerCase().split(',').map(k => k.trim()) || [];
-      let detected = false;
-      let customExplanation = criterion.explanation || '';
+    // CATEGORY 1: Payment/Monetization Indicators
+    const paymentCheck = checkPaymentIndicators(inputText);
+    if (paymentCheck.detected) {
+      categoriesTriggered.push('Payment/Monetization');
+      const contribution = 25; // Each category = 25% base risk
+      totalRisk += contribution;
+      detectedFlags.push({
+        name: 'Payment/Monetization Indicators',
+        detected: true,
+        explanation: paymentCheck.details,
+        riskContribution: contribution,
+        severityLevel: 'high'
+      });
+    }
 
-      // Payment criterion - enhanced detection for tuition, fees, and payment requests
-      if (criterionName.includes('payment') || criterionName.includes('upfront')) {
-        // Pattern 1: Direct payment REQUEST patterns
-        const paymentRequestPatterns = [
-          /\b(pay|payment|deposit|fee|charge|cost)\s+(required|needed|must|should|necessary|mandatory|expected|demanded)/i,
-          /\b(require|need|must|should|expect|demand)\s+\w*\s*(pay|payment|deposit|fee|charge|cost)/i,
-          /\b(upfront|advance|initial|registration|processing|training)\s+(pay|payment|deposit|fee|charge|cost)/i,
-          /\b(pay|payment|deposit|fee|charge|cost)?\s*(upfront|advance|initial|first|before|prior)/i,
-          /\b(send|transfer|wire|remit)\s+\w*\s*(money|payment|amount|funds)/i,
-          /\b(₹|£|\$|€)\s*\d+\s*(fee|charge|deposit|payment|cost)/i,
-          /\b(you|candidate|applicant)?\s*(will|must|need to|should|have to)?\s*(pay|deposit|send|transfer)/i
-        ];
-        
-        detected = paymentRequestPatterns.some(pattern => pattern.test(inputText));
-        
-        // Pattern 2: Tuition and fee-related mentions (including reductions/discounts)
-        // These indicate a payment structure even if not explicitly requesting payment
-        const tuitionFeePatterns = [
-          /\b(tuition|course fee|training fee|enrollment fee|admission fee|certification fee)/i,
-          /\b\d+\s*(?:percent|%)\s+(tuition|fee|cost)?\s*(reduction|discount|waiver)/i,
-          /\b(tuition|fee|cost)?\s*(reduction|discount|waiver)\s+(?:of\s+)?\d+\s*(?:percent|%)/i,
-          /\b(reduced|discounted)\s+(tuition|fee|cost)/i,
-          /\b(tuition|fee)\s+(?:is\s+)?(?:only\s+)?(?:₹|£|\$|€)?\s*\d+/i,
-          /\b(training|course|program|certification)\s+(fee|cost|charge)/i,
-          /\b(fee|cost|charge|payment)\s+(?:for|of)\s+(training|course|program|certification)/i
-        ];
-        
-        if (!detected) {
-          detected = tuitionFeePatterns.some(pattern => pattern.test(inputText));
-        }
-        
-        // Pattern 3: Deferred payment/compensation discussions (work before pay clarity)
-        const deferredPaymentPatterns = [
-          /\b(salary|stipend|compensation|payment|pay)\s+(?:will be|to be|can be)?\s*(discussed|negotiated|decided|determined|shared|revealed)\s+(?:after|later|upon|following)/i,
-          /\b(discussed|negotiated|decided|determined|shared|revealed)\s+(?:after|later|upon|following)\s+.{0,30}(task|assignment|work|project|submission|completion)/i,
-          /\b(compensation|payment|stipend|salary)\s+(?:details|information|amount)?\s*(will be|to be)?\s*(discussed|shared|provided|revealed)\s+later/i,
-          /\b(after|upon|following)\s+.{0,20}(task|assignment|work|project|submission)\s+.{0,30}(discuss|share|reveal|determine)\s+.{0,20}(compensation|payment|stipend|salary)/i
-        ];
-        
-        if (!detected) {
-          detected = deferredPaymentPatterns.some(pattern => pattern.test(inputText));
-        }
-        
-        // Pattern 4: Contextual payment demands (if basic keywords match)
-        if (!detected && keywords.some(keyword => textLower.includes(keyword))) {
-          // Check if it's in context of a request/demand (not just mentioning salary/compensation)
-          const contextualCheck = /(you must|you need to|you should|please|kindly|required to|have to|will need to)\s+.{0,50}(pay|payment|fee|deposit|charge)/i;
-          detected = contextualCheck.test(inputText);
-        }
-        
-        // Pattern 5: Any mention of payment/fee in job context (broadest catch)
-        if (!detected) {
-          // Check for any fee/payment mention that's not about salary being paid TO the candidate
-          const broadPaymentCheck = /\b(fee|charge|deposit|payment|cost)\b/i;
-          if (broadPaymentCheck.test(inputText)) {
-            // Exclude if it's clearly about salary/compensation TO the candidate
-            const salaryContext = /\b(salary|compensation|pay|wage|income|earning)\s+(?:of|is|will be|:)\s*(?:₹|£|\$|€)?\s*\d+/i;
-            if (!salaryContext.test(inputText)) {
-              detected = true;
-            }
-          }
-        }
-      }
-      // Urgency/Pressure criterion - enhanced detection
-      else if (criterionName.includes('urgency') || criterionName.includes('pressure')) {
-        detected = checkUrgencyPressure(inputText, keywords);
-      }
-      // External messaging criterion - enhanced detection
-      else if (criterionName.includes('messaging') || criterionName.includes('external')) {
-        detected = checkExternalMessaging(inputText, keywords);
-      }
-      // For any other criteria, check keywords normally
-      else {
-        detected = keywords.some(keyword => textLower.includes(keyword));
-      }
-      
-      if (detected) {
-        const contribution = criterion.riskContribution || 25;
-        totalRisk += contribution;
-        detectedFlags.push({
-          name: criterion.name || '',
-          detected: true,
-          explanation: customExplanation,
-          riskContribution: contribution,
-          severityLevel: criterion.severityLevel || 'medium'
-        });
-      }
-    });
+    // CATEGORY 2: Urgency & Psychological Pressure
+    const urgencyCheck = checkUrgencyPressure(inputText);
+    if (urgencyCheck.detected) {
+      categoriesTriggered.push('Urgency/Pressure');
+      const contribution = 25;
+      totalRisk += contribution;
+      detectedFlags.push({
+        name: 'Urgency & Psychological Pressure',
+        detected: true,
+        explanation: urgencyCheck.details,
+        riskContribution: contribution,
+        severityLevel: 'medium'
+      });
+    }
 
-    // Check for salary anomalies separately with enhanced logic
+    // CATEGORY 3: Off-Platform/External Communication
+    const externalCheck = checkExternalMessaging(inputText);
+    if (externalCheck.detected) {
+      categoriesTriggered.push('External Communication');
+      const contribution = 25;
+      totalRisk += contribution;
+      detectedFlags.push({
+        name: 'Off-Platform/External Communication',
+        detected: true,
+        explanation: externalCheck.details,
+        riskContribution: contribution,
+        severityLevel: 'high'
+      });
+    }
+
+    // CATEGORY 4: Salary/Benefit Anomalies & Role Mismatch
     const salaryCheck = checkSalaryAnomalies(inputText);
     if (salaryCheck.detected) {
-      const salaryCriterion = redFlagCriteria.find(c => c.name?.toLowerCase().includes('salary'));
-      if (salaryCriterion) {
-        // Only add if not already detected
-        const alreadyAdded = detectedFlags.some(f => f.name?.toLowerCase().includes('salary'));
-        if (!alreadyAdded) {
-          const contribution = salaryCriterion.riskContribution || 25;
-          totalRisk += contribution;
-          detectedFlags.push({
-            name: salaryCriterion.name || 'Salary Anomaly',
-            detected: true,
-            explanation: salaryCheck.details || salaryCriterion.explanation || 'Unrealistic salary detected',
-            riskContribution: contribution,
-            severityLevel: salaryCriterion.severityLevel || 'medium'
-          });
-        }
-      }
+      categoriesTriggered.push('Salary/Benefit Anomalies');
+      const contribution = 25;
+      totalRisk += contribution;
+      detectedFlags.push({
+        name: 'Salary/Benefit Anomalies & Role Mismatch',
+        detected: true,
+        explanation: salaryCheck.details,
+        riskContribution: contribution,
+        severityLevel: 'medium'
+      });
+    }
+
+    // Ensure risk score is NEVER 0 if any category is triggered
+    if (categoriesTriggered.length > 0 && totalRisk === 0) {
+      totalRisk = 20; // Minimum 20% if any flag detected
     }
 
     totalRisk = Math.min(totalRisk, 100);
+    
+    // Risk level based on categories triggered
     let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
-    if (totalRisk <= 30) riskLevel = 'LOW';
-    else if (totalRisk <= 60) riskLevel = 'MEDIUM';
-    else riskLevel = 'HIGH';
+    if (categoriesTriggered.length === 0) {
+      riskLevel = 'LOW';
+    } else if (categoriesTriggered.length === 1) {
+      riskLevel = 'MEDIUM'; // 1 category = Verify
+    } else if (categoriesTriggered.length === 2) {
+      riskLevel = 'HIGH'; // 2 categories = High Risk
+    } else {
+      riskLevel = 'HIGH'; // 3+ categories = Very High Risk (Avoid)
+    }
 
     const recommendations = getRecommendations(riskLevel, detectedFlags);
     const endTime = performance.now();
@@ -664,17 +681,45 @@ export default function HomePage() {
                 </AnimatedReveal>
 
                 <div className="space-y-4">
-                  {redFlagCriteria.map((criteria, idx) => (
-                    <AnimatedReveal key={criteria._id || idx} delay={idx * 100}>
-                      <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">{criteria.name}</h3>
-                          <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
-                        </div>
-                        <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">{criteria.explanation}</p>
+                  <AnimatedReveal>
+                    <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Payment/Monetization Indicators</h3>
+                        <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
                       </div>
-                    </AnimatedReveal>
-                  ))}
+                      <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Detects direct/indirect payment demands including tuition, training fees, deferred compensation, and monetized internship models</p>
+                    </div>
+                  </AnimatedReveal>
+
+                  <AnimatedReveal delay={100}>
+                    <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Urgency & Psychological Pressure</h3>
+                        <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
+                      </div>
+                      <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Flags urgency language, artificial scarcity, deadline pressure, and psychological manipulation tactics</p>
+                    </div>
+                  </AnimatedReveal>
+
+                  <AnimatedReveal delay={200}>
+                    <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Off-Platform/External Communication</h3>
+                        <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
+                      </div>
+                      <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Detects attempts to move communication to WhatsApp, Telegram, Google Forms, or other unofficial channels</p>
+                    </div>
+                  </AnimatedReveal>
+
+                  <AnimatedReveal delay={300}>
+                    <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Salary/Benefit Anomalies & Role Mismatch</h3>
+                        <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
+                      </div>
+                      <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Identifies unrealistic guarantees, placement assurances, inflated salaries, and misleading benefit claims</p>
+                    </div>
+                  </AnimatedReveal>
                 </div>
               </div>
             </div>
@@ -832,16 +877,16 @@ export default function HomePage() {
                                     </h4>
                                     <p className="text-black/80 dark:text-white/80 leading-relaxed">
                                       {analysisResult.riskLevel === 'LOW' && analysisResult.totalRisk === 0 && (
-                                        "No red flags detected. This opportunity appears legitimate based on our analysis. However, always verify company details independently before proceeding."
-                                      )}
-                                      {analysisResult.riskLevel === 'LOW' && analysisResult.totalRisk > 0 && (
-                                        "Minor red flags detected. Consider contacting the recruiter for clarification before taking any action. Verify company authenticity through official channels."
+                                        "✅ Safe - No red flags detected. This opportunity appears legitimate based on our analysis. However, always verify company details independently before proceeding."
                                       )}
                                       {analysisResult.riskLevel === 'MEDIUM' && (
-                                        "Moderate risk detected. Exercise caution and thoroughly verify the company's legitimacy. Do not share sensitive personal information or make any payments until you've confirmed authenticity through multiple sources."
+                                        "⚠️ Verify - One red flag category detected. Exercise caution and thoroughly verify the company's legitimacy. Do not share sensitive personal information or make any payments until you've confirmed authenticity through multiple sources."
                                       )}
-                                      {analysisResult.riskLevel === 'HIGH' && (
-                                        "High risk detected. This opportunity shows multiple warning signs of a potential scam. Avoid sharing personal details or making any payments. Verify company authenticity through official websites and trusted sources before proceeding."
+                                      {analysisResult.riskLevel === 'HIGH' && analysisResult.detectedFlags.length === 2 && (
+                                        "🚨 High Risk - Two red flag categories detected. This opportunity shows multiple warning signs of a potential scam. Avoid sharing personal details or making any payments. Verify company authenticity through official websites and trusted sources before proceeding."
+                                      )}
+                                      {analysisResult.riskLevel === 'HIGH' && analysisResult.detectedFlags.length >= 3 && (
+                                        "🛑 Avoid - Three or more red flag categories detected. This is very likely a scam. Do NOT proceed with this opportunity. Do NOT share any personal information or make any payments. Report this to the platform immediately."
                                       )}
                                     </p>
                                   </div>
