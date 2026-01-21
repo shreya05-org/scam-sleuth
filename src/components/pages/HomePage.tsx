@@ -684,7 +684,7 @@ export default function HomePage() {
                   <AnimatedReveal>
                     <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Payment/Monetization Indicators</h3>
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Upfront Payment Requests</h3>
                         <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
                       </div>
                       <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Detects direct/indirect payment demands including tuition, training fees, deferred compensation, and monetized internship models</p>
@@ -694,7 +694,7 @@ export default function HomePage() {
                   <AnimatedReveal delay={100}>
                     <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Urgency & Psychological Pressure</h3>
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Urgency/Pressure Language</h3>
                         <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
                       </div>
                       <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Flags urgency language, artificial scarcity, deadline pressure, and psychological manipulation tactics</p>
@@ -704,7 +704,7 @@ export default function HomePage() {
                   <AnimatedReveal delay={200}>
                     <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Off-Platform/External Communication</h3>
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">External Messaging Shift</h3>
                         <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
                       </div>
                       <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Detects attempts to move communication to WhatsApp, Telegram, Google Forms, or other unofficial channels</p>
@@ -714,7 +714,7 @@ export default function HomePage() {
                   <AnimatedReveal delay={300}>
                     <div className="group p-4 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-primary/50 transition-colors cursor-default">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Salary/Benefit Anomalies & Role Mismatch</h3>
+                        <h3 className="font-heading font-bold text-black dark:text-white group-hover:text-primary transition-colors">Unrealistic Job Offers/Salary Anomalies</h3>
                         <AlertOctagon className="w-4 h-4 text-black/30 dark:text-white/30 group-hover:text-primary transition-colors" />
                       </div>
                       <p className="text-sm text-black/50 dark:text-white/50 line-clamp-2">Identifies unrealistic guarantees, placement assurances, inflated salaries, and misleading benefit claims</p>
