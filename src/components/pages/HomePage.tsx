@@ -184,31 +184,47 @@ export default function HomePage() {
   const checkUrgencyPressure = (text: string, keywords: string[]): boolean => {
     const textLower = text.toLowerCase();
     
-    // Pattern 1: Time-pressure phrases
+    // Pattern 1: Time-pressure phrases (ENHANCED)
     const timePressurePatterns = [
       /\b(immediate|urgent|asap|right away|right now|today|within \d+ (hours?|days?))\b/i,
-      /\b(limited (time|spots?|positions?|openings?))\b/i,
+      /\b(limited (time|spots?|positions?|openings?|seats?))\b/i,
       /\b(act (now|fast|quickly|immediately))\b/i,
-      /\b(offer expires?|deadline|last chance|final (call|opportunity))\b/i,
+      /\b(offer expires?|deadline|last (chance|date|day)|final (call|opportunity))\b/i,
       /\b(hurry|rush|don't (wait|delay|miss))\b/i,
-      /\b(only \d+ (spots?|positions?|openings?) (left|remaining|available))\b/i
+      /\b(only \d+ (spots?|positions?|openings?|seats?) (left|remaining|available))\b/i,
+      /\b(last date to (fill|apply|register|submit))\b/i,
+      /\b(finite seats?|limited seats?)\b/i,
+      /\b(early (registration|submission|application) (is )?(highly )?(recommended|encouraged|advised))\b/i,
+      /\b(applications? (are )?reviewed on a rolling basis)\b/i,
+      /\b(seats? (are )?filling (fast|quickly))\b/i,
+      /\b(don't (miss|delay)|risk falling behind)\b/i,
+      /\b(next batch starts?|batch (starting|begins))\b/i,
+      /\b(if you don't (join|apply|register) now)\b/i
     ];
 
-    // Pattern 2: Pressure tactics
+    // Pattern 2: Pressure tactics (ENHANCED)
     const pressureTactics = [
-      /\b(must (respond|reply|apply|act|decide)|you (must|need to|have to) (respond|reply|apply|act|decide))\b/i,
+      /\b(must (respond|reply|apply|act|decide|fill|register|submit)|you (must|need to|have to) (respond|reply|apply|act|decide|fill|register|submit))\b/i,
       /\b(confirm (immediately|now|today|asap))\b/i,
       /\b(this is your (only|last) (chance|opportunity))\b/i,
       /\b(won't get (another|this) (chance|opportunity))\b/i,
-      /\b(decision (required|needed) (immediately|now|today))\b/i
+      /\b(decision (required|needed) (immediately|now|today))\b/i,
+      /\b(make sure you (guys are )?filling)\b/i,
+      /\b(ensure that you enter|essential that no one misses)\b/i,
+      /\b(without (any )?delay)\b/i,
+      /\b(attendance .{0,20}mandatory)\b/i
     ];
 
-    // Pattern 3: Artificial scarcity
+    // Pattern 3: Artificial scarcity (ENHANCED)
     const scarcityPatterns = [
       /\b(filling fast|almost full|nearly full)\b/i,
       /\b(high demand|overwhelming response)\b/i,
       /\b(selected (few|candidates?))\b/i,
-      /\b(exclusive (offer|opportunity))\b/i
+      /\b(exclusive (offer|opportunity))\b/i,
+      /\b(limited to (the )?first \d+)\b/i,
+      /\b(finite (seats?|spots?|positions?))\b/i,
+      /\b(you have been selected)\b/i,
+      /\b(congratulations.{0,30}selected)\b/i
     ];
 
     // Check if any patterns match
@@ -219,17 +235,18 @@ export default function HomePage() {
     // Also check basic keywords
     const hasKeywords = keywords.some(keyword => textLower.includes(keyword));
 
-    // Detected if multiple indicators present or strong single indicator
-    return (hasTimePressure && (hasPressureTactics || hasScarcity || hasKeywords)) || 
-           (hasPressureTactics && hasScarcity) ||
-           (hasKeywords && (hasTimePressure || hasPressureTactics));
+    // Detected if ANY strong indicator present (lowered threshold)
+    return hasTimePressure || 
+           hasPressureTactics || 
+           hasScarcity ||
+           (hasKeywords && (hasTimePressure || hasPressureTactics || hasScarcity));
   };
 
   // Enhanced External Messaging Detection
   const checkExternalMessaging = (text: string, keywords: string[]): boolean => {
     const textLower = text.toLowerCase();
     
-    // Pattern 1: Direct requests to move off-platform
+    // Pattern 1: Direct requests to move off-platform (ENHANCED)
     const offPlatformPatterns = [
       /\b(contact (me|us) (on|via|through|at))\s+(whatsapp|telegram|signal|wechat|email|phone)/i,
       /\b(message (me|us) (on|via|through|at))\s+(whatsapp|telegram|signal|wechat)/i,
@@ -240,26 +257,34 @@ export default function HomePage() {
       /\b(interested|candidates?|applicants?)\s+(?:please|kindly)?\s*(message|contact|reach|text|call|email)\s+(?:me|us)?\s*(?:on|via|at|directly)/i
     ];
 
-    // Pattern 2: Providing external contact details
+    // Pattern 2: Providing external contact details (ENHANCED - detect Google Forms)
     const contactDetailsPatterns = [
       /\b(my|our) (whatsapp|telegram|signal|wechat|email|phone|number)\s*(is|:|-)?\s*[\d@]/i,
       /\b(whatsapp|telegram|signal|wechat)\s*(number|id|contact)\s*[:|-]?\s*[\d+]/i,
       /\b(email|e-mail)\s*(me|us)?\s*(at|:|-)?\s*[\w.-]+@[\w.-]+\.\w+/i,
-      /\b\d{10,}\b.*\b(whatsapp|telegram|call|text|message)/i
+      /\b\d{10,}\b.*\b(whatsapp|telegram|call|text|message)/i,
+      // Google Forms detection
+      /\b(forms\.gle|docs\.google\.com\/forms)\b/i,
+      /\b(fill (the|this|out) (form|application))\b/i,
+      /\b(application form|registration form|form link)\b/i,
+      /\bhttps?:\/\/forms\.gle\/[a-zA-Z0-9]+/i
     ];
 
-    // Pattern 3: Urgency to move communication
+    // Pattern 3: Urgency to move communication (ENHANCED)
     const urgentMovePatterns = [
-      /\b(please|kindly|quickly|immediately)\s+.{0,30}(whatsapp|telegram|email|call|text|message)/i,
+      /\b(please|kindly|quickly|immediately)\s+.{0,30}(whatsapp|telegram|email|call|text|message|fill|apply|register)/i,
       /\b(respond|reply|contact)\s+.{0,20}(whatsapp|telegram|email|directly)/i,
-      /\b(continue|proceed)\s+.{0,20}(whatsapp|telegram|email|off-?platform)/i
+      /\b(continue|proceed)\s+.{0,20}(whatsapp|telegram|email|off-?platform)/i,
+      /\b(fill (the|this) (form|application) (to|for|without fail))/i,
+      /\b(click (the|this) link)\b/i
     ];
 
-    // Pattern 4: Avoiding official channels
+    // Pattern 4: Avoiding official channels (ENHANCED)
     const avoidOfficialPatterns = [
       /\b(don't|do not|avoid)\s+.{0,30}(reply|respond|use)\s+.{0,30}(this platform|here|job (board|site|portal))/i,
       /\b(easier|better|faster|quicker)\s+.{0,30}(whatsapp|telegram|email|directly)/i,
-      /\b(official|company)\s+.{0,30}(communication|process)\s+.{0,30}(whatsapp|telegram|email)/i
+      /\b(official|company)\s+.{0,30}(communication|process)\s+.{0,30}(whatsapp|telegram|email)/i,
+      /\b(external|third-party) (form|link|application|website)/i
     ];
 
     // Check patterns
@@ -271,11 +296,11 @@ export default function HomePage() {
     // Check basic keywords
     const hasKeywords = keywords.some(keyword => textLower.includes(keyword));
 
-    // Detected if explicit off-platform request or multiple indicators
+    // Detected if ANY strong indicator present (lowered threshold)
     return hasOffPlatform || 
            hasContactDetails || 
-           (hasUrgentMove && hasKeywords) || 
-           (hasAvoidOfficial && hasKeywords) ||
+           hasUrgentMove ||
+           hasAvoidOfficial ||
            (hasKeywords && (hasUrgentMove || hasContactDetails));
   };
 
